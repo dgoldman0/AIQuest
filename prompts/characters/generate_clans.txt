@@ -1,5 +1,10 @@
 Setting:
 {}
 
-Generate 10 clans (species) found in this realm. Use the following format (without numbering): Clan Name | Long Description  | Short Description | Elemental Affinities (Combination of Earth, Fire, Air, Water, Light, Shadow)
-Clans:
+History:
+{}
+
+Setting Name: {}
+
+Generate 10 clans (species) found in this realm.
+Clan Name (be diverse and use one word) | Short Description (One sentence) | Long Description (Paragraph) | Elemental Affinities (Combination of Earth, Fire, Air, Water, Light, Shadow)

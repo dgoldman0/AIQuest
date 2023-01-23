@@ -38,7 +38,7 @@ def init():
             cur.execute("CREATE TABLE CHARACTER_DETAILS (character_id INT NOT NULL, clan_id INT NOT NULL, background TEXT NOT NULL, affinities TEXT NOT NULL);")
             cur.execute("CREATE TABLE CHARACTER_LOCATION (character_id INT NOT NULL, realm_id INT NOT NULL, x INT NOT NULL, y INT NOT NULL);")
             # Basic World Settings Table
-            cur.execute("CREATE TABLE REALMS (name TEXT NOT NULL, setting TEXT NOT NULL);")
+            cur.execute("CREATE TABLE REALMS (name TEXT NOT NULL, setting TEXT NOT NULL, history TEXT NOT NULL);")
             # Clan List Table
             cur.execute("CREATE TABLE CLANS (realm_id INT NOT NULL, name TEXT NOT NULL, short_description TEXT NOT NULL, long_description TEXT NOT NULL, affinities TEXT NOT NULL);")
             # Create spell tables.
@@ -64,18 +64,24 @@ def add_user(username, password, salt):
     return id
 
 # Realm Data
-def add_realm(name, setting):
+def add_realm(name, setting, history):
     global database
     cur = database.cursor()
-    cur.execute("INSERT INTO REALMS (name, setting) VALUES (?, ?);", (name, setting, ))
+    cur.execute("INSERT INTO REALMS (name, setting, history) VALUES (?, ?, ?);", (name, setting, history, ))
     id = cur.lastrowid
     database.commit()
     return id
 
-def get_setting(realm = 0):
+def get_setting(realm = 1):
     global database
     cur = database.cursor()
-    res = cur.execute("SELECT name, setting FROM REALM WHERE rowid = ?;", (realm, ))
+    res = cur.execute("SELECT setting FROM REALM WHERE rowid = ?;", (realm, ))
+    return res.fetchone()
+
+def get_history(realm = 1):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT setting FROM REALM WHERE rowid = ?;", (realm, ))
     return res.fetchone()
 
 # Spell Data
@@ -145,12 +151,12 @@ def get_clan(clan_id):
     res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     return res.fetchone()
 
-def add_character(clan_id, name, background, affinities, current_realm, x, y, user_id):
+def add_character(clan_id, name, background, affinities, realm_id, x, y, user_id):
     global database
     cur = database.cursor()
     cur.execute("INSERT INTO CHARACTERS (user_id, name) VALUES (?, ?);", (user_id, name))
     character_id = cur.lastrowid
-    cur.execute("INSERT INTO CHARACTER_DETAILS (character_id, clan_id, background, affinities) VALUES (?, ?, ?, ?)", (character_id, clan_id, backround, affinities, ))
+    cur.execute("INSERT INTO CHARACTER_DETAILS (character_id, clan_id, background, affinities) VALUES (?, ?, ?, ?)", (character_id, clan_id, background, affinities, ))
     cur.execute("INSERT INTO CHARACTER_LOCATION (character_id, realm_id, x, y) VALUES (?, ?, ?, ?)", (character_id, realm_id, x, y, ))
     database.commit()
     return character_id

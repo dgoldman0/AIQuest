@@ -1,4 +1,7 @@
 Setting:
 {}
 
-Create a location that is {} by {}.
+History:
+{}
+
+Create a current location that is {} by {}.

@@ -85,7 +85,7 @@ async def handle_player(websocket, path = None):
                 x = randint(0, 20000000)
                 y = randint(0, 20000000)
                 character_id = characters.generate_character(clan_id, realm_id, x, y, user_id)
-                return
+                players.set_websocket(user_id, websockets)
                 players.welcome(user_id)
             else:
                 await websocket.send("EXISTINGUSER")
