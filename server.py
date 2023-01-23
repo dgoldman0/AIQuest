@@ -4,7 +4,9 @@ import players
 import ssl
 import pathlib
 import bcrypt
+import characters
 from random import randint
+import json
 
 data = None
 
@@ -40,18 +42,16 @@ async def handle_player(websocket, path = None):
                 # Not sure what to do next.
 
         elif response.startswith("REGISTER:"):
-            username = response[8:]
+            username = response[9:]
             user = data.get_user(username)
             if user is None:
                 salt = bcrypt.gensalt().decode()
                 await websocket.send("CHALLENGE:" + salt)
                 password = await websocket.recv()
-                print("Adding User")
-                data.add_user(username, password, salt)
                 # Have user select realm.
                 realmlist = data.get_realmlist()
                 print(realmlist)
-                await websocket.send("REALMS:" + str(realmlist))
+                await websocket.send("REALMS:" + json.dumps(realmlist))
                 realm_id = None
                 while realm_id is None:
                     selection = await websocket.recv()
@@ -64,13 +64,8 @@ async def handle_player(websocket, path = None):
                     except:
                         await websocket.send("INVALIDREALM")
 
-                # Place user randomly into the realm.
-                x = randint(0, 20000000)
-                y = randint(0, 20000000)
-                data.set_user_location(user['username'], x, y)
-
                 clanlist = data.get_clanlist(realm_id)
-                await websocket.send("CLANS:" + clanlist)
+                await websocket.send("CLANS:" + json.dumps(clanlist))
                 clan_id = None
                 while clan_id is None:
                     selection = await websocket.recv()
@@ -82,7 +77,16 @@ async def handle_player(websocket, path = None):
                             await websocket.send("INVALIDCLAN")
                     except:
                         await websocket.send("INVALIDCLAN")
-                players.generate_character(realm_id, clan_id)
+
+                print("Adding User")
+                user_id = data.add_user(username, password, salt)
+
+                # Place user randomly into the realm.
+                x = randint(0, 20000000)
+                y = randint(0, 20000000)
+                character_id = characters.generate_character(clan_id, realm_id, x, y, user_id)
+                return
+                players.welcome(user_id)
             else:
                 await websocket.send("EXISTINGUSER")
 

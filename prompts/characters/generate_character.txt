@@ -6,5 +6,5 @@ Setting:
 Clan information (Clan Name | Description | Elemental Affinities):
 {} | {} | {}
 
-Use the following format: Character Name | Background | Elemental Affinities (choose any combination of Earth, Fire, Air, Water, Light, Shadow, with preference to clan affinities)
+Use the following format: Character Name | Background (Detailed) | Starting Elemental Affinities
 Character:

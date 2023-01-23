@@ -34,12 +34,13 @@ def init():
             salt = bcrypt.gensalt()
             password = bcrypt.hashpw(password1.encode(), salt)
             cur.execute("INSERT INTO USERS (username, passwd, salt, admin) VALUES (?, ?, ?, ?);", (username, password, salt, True))
-            cur.execute("CREATE TABLE CHARACTERS (user_id INT, current_realm INT NOT NULL, x_loc INT NOT NULL, y_loc INT NOT NULL, player INT NOT NULL DEFAULT FALSE);")
-            cur.execute("CREATE TABLE CHARACTER_DETAILS (character_id INT NOT NULL, name TEXT NOT NULL, clan_id INT NOT NULL, background TEXT NOT NULL, affinities TEXT NOT NULL);")
+            cur.execute("CREATE TABLE CHARACTERS (user_id INT, name TEXT NOT NULL);")
+            cur.execute("CREATE TABLE CHARACTER_DETAILS (character_id INT NOT NULL, clan_id INT NOT NULL, background TEXT NOT NULL, affinities TEXT NOT NULL);")
+            cur.execute("CREATE TABLE CHARACTER_LOCATION (character_id INT NOT NULL, realm_id INT NOT NULL, x INT NOT NULL, y INT NOT NULL);")
             # Basic World Settings Table
             cur.execute("CREATE TABLE REALMS (name TEXT NOT NULL, setting TEXT NOT NULL);")
             # Clan List Table
-            cur.execute("CREATE TABLE CLANS (realm_id INT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, affinities TEXT NOT NULL);")
+            cur.execute("CREATE TABLE CLANS (realm_id INT NOT NULL, name TEXT NOT NULL, short_description TEXT NOT NULL, long_description TEXT NOT NULL, affinities TEXT NOT NULL);")
             # Create spell tables.
             cur.execute("CREATE TABLE SPELLS (name TEXT NOT NULL, elements TEXT NOT NULL, tier TEXT NOT NULL, cost INT NOT NULL, description TEXT NOT NULL, mishaps TEXT);")
             # Create map tables.
@@ -55,10 +56,14 @@ def get_user(username):
     return None
 
 def add_user(username, password, salt):
-    pass
+    global database
+    cur = database.cursor()
+    cur.execute("INSERT INTO USERS (username, passwd, salt, admin) VALUES (?, ?, ?, FALSE);", (username, password, salt))
+    id = cur.lastrowid
+    database.commit()
+    return id
 
 # Realm Data
-
 def add_realm(name, setting):
     global database
     cur = database.cursor()
@@ -111,14 +116,18 @@ def get_realmlist():
 
 def get_realm(realm_id = 0):
     cur = database.cursor()
-    res = cur.execute("SELECT name, description FROM REALMS WHERE rowid = ?;", (realm_id, ))
+    res = cur.execute("SELECT name, setting FROM REALMS WHERE rowid = ?;", (realm_id, ))
     return res.fetchone()
 
 # Character Data
-def get_clanlist(realm_id):
+def get_clanlist(realm_id, full = False):
     global database
     cur = database.cursor()
-    res = cur.execute("SELECT rowid, name, description, affinities FROM REALMS;")
+    res = None
+    if full:
+        res = cur.execute("SELECT rowid, name, short_description, long_description, affinities FROM CLANS;")
+    else:
+        res = cur.execute("SELECT rowid, name, short_description, affinities FROM CLANS;")
     return res.fetchall()
 
 def add_clans(realm_id, clans):
@@ -126,29 +135,32 @@ def add_clans(realm_id, clans):
     cur = database.cursor()
     # It's okay to inject realm_id because it has to be an integer.
     realm_id = str(int(realm_id))
-    cur.executemany("INSERT INTO CLANS (realm_id, name, description, affinities) VALUES (" + realm_id + ", ?, ?, ?);", clans)
+    cur.executemany("INSERT INTO CLANS (realm_id, name, short_description, long_description, affinities) VALUES (" + realm_id + ", ?, ?, ?, ?);", clans)
     database.commit()
 
 def get_clan(clan_id):
     global database
     cur = database.cursor()
-    res = cur.execute("SELECT name, description, affinities FROM REALMS WHERE rowid = ?;", (clan_id))
+    print(clan_id)
+    res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     return res.fetchone()
 
-def add_character(clan_id, name, background, affinities, current_realm, x, y, user_id, player):
+def add_character(clan_id, name, background, affinities, current_realm, x, y, user_id):
     global database
     cur = database.cursor()
-    cur.execute("INSERT INTO CHARACTERS (user_id, clan_id, name, background, affinities, player) VALUES (?, ?, ?, ?, ?, ?);", (user_id, clan_id, name, background, affinities, player))
-    id = cur.lastrowid
+    cur.execute("INSERT INTO CHARACTERS (user_id, name) VALUES (?, ?);", (user_id, name))
+    character_id = cur.lastrowid
+    cur.execute("INSERT INTO CHARACTER_DETAILS (character_id, clan_id, background, affinities) VALUES (?, ?, ?, ?)", (character_id, clan_id, backround, affinities, ))
+    cur.execute("INSERT INTO CHARACTER_LOCATION (character_id, realm_id, x, y) VALUES (?, ?, ?, ?)", (character_id, realm_id, x, y, ))
     database.commit()
-    return id
+    return character_id
 
-def update_character_location():
+def update_character_location(realm_id, x, y):
     global database
     cur = database.cursor()
     database.commit()
 
-def update_character_background():
+def update_character_background(character_id, background):
     global database
     cur = database.cursor()
     database.commit()

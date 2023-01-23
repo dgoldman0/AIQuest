@@ -1,8 +1,14 @@
 // Source code uses examples from https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications
 
+ws = null;
+status = "connecting";
 
 function htmlEncode(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function send_message(msg) {
+  await ws.send(msg)
 }
 
 $(document).ready(function() {
@@ -11,8 +17,6 @@ $(document).ready(function() {
   username = "GUEST"
   password = ""
   url = "ws://localhost:9289"
-  ws = null;
-  status = "connecting";
   activity = null;
 
   if ("WebSocket" in window) {
@@ -61,10 +65,25 @@ $(document).ready(function() {
                 f.innerHTML += "Unable to connect: User is blocked from accessing SAM."
               }
             } else if (activity == "register") {
-              status = "realms";
-              if (msg.startWith("REALMS:")) {
-                f.innerHTML += "<br/>System Notice: Registered. Continuing to character creation..."
-                console.log(msg.substring(7))
+              // Neither of these tables are disabled after selection. Need to really clean things up properly.
+              if (msg.startsWith("REALMS:")) {
+                f.innerHTML += "<br/>Select Starting Realm"
+                realms = JSON.parse(msg.substring(7))
+                html = "<br/><table id = 'realmselect' class = 'styled-table'><tr><th>Realm</th><th>Description</th></tr>"
+                for (realm of realms) {
+                  html += "<tr onclick = 'send_message(" + realm[0] + ");'><td>" + realm[1] + "</td><td>" + realm[2] + "</td></tr>"
+                }
+                console.log(html)
+                f.innerHTML += html
+              } else if (msg.startsWith("CLANS:")) {
+                f.innerHTML += "<br/>Select Starting Clan"
+                clans = JSON.parse(msg.substring(6))
+                html = "<br/><table class = 'styled-table'><tr><th>Clan</th><th>Description</th></tr>"
+                for (clan of clans) {
+                  html += "<tr onclick = 'send_message(" + clan[0] + ");'><td>" + clan[1] + "</td><td>" + clan[2] + "</td></tr>"
+                }
+                console.log(html)
+                f.innerHTML += html
               }
             }
             break;
