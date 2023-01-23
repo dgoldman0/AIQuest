@@ -1,4 +1,4 @@
-Character Information:
+Player Character Information:
 Name: {}
 Background: {}
 Clan: {}
@@ -6,5 +6,5 @@ Clan: {}
 Clan Information:
 Description: {}
 
-This character is the player's character. Introduce their character to them.
-Introduction:
+Describe the player's character to the player. Use second person.
+Description:

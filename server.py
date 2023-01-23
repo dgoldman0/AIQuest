@@ -25,21 +25,19 @@ async def handle_player(websocket, path = None):
     if response is not None:
         if response.startswith("AUTH:"):
             username = response[5:]
-            user = data.get_user(username)
+            # rowid, username, passwd, salt
+            user = data.get_user_by_username(username)
             if user is None:
                 print("Unidentified user: " + username)
                 await websocket.send("UNKNOWN")
                 return
             else:
-                await websocket.send("CHALLENGE:" + str(user.salt))
+                await websocket.send("CHALLENGE:" + str(user[3]))
                 response = await websocket.recv()
                 if response is not None:
-                    if response == user.password:
-                        await websocket.send("WELCOME")
-            user['websocket'] = websocket
-            while True:
-                message = await websocket.recv()
-                # Not sure what to do next.
+                    if response == user[2]:
+                        players.set_websocket(user[0], websocket)
+                        await player.load(user[0])
 
         elif response.startswith("REGISTER:"):
             username = response[9:]
@@ -84,9 +82,9 @@ async def handle_player(websocket, path = None):
                 # Place user randomly into the realm.
                 x = randint(0, 20000000)
                 y = randint(0, 20000000)
-                character_id = characters.generate_character(clan_id, realm_id, x, y, user_id)
-                players.set_websocket(user_id, websockets)
-                await websocket.send("WELCOME")
+                character_id = characters.generate_character('novice', clan_id, realm_id, x, y, user_id)
+                players.set_websocket(user_id, websocket)
+                await websocket.send("SUCCESS")
                 await players.welcome(user_id, character_id, clan_id, realm_id, x, y)
             else:
                 await websocket.send("EXISTINGUSER")

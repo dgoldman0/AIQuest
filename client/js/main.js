@@ -12,6 +12,8 @@ async function send_message(msg) {
 }
 
 $(document).ready(function() {
+  const f = document.getElementById("chat-history");
+  f.innerHTML = "AIQuest Console..."
   const urlParams = new URLSearchParams(window.location.search);
   // Yes I know this isn't a secure way to do things, but for now it's fine and I'm too exhausted to create a better system.
   username = "GUEST"
@@ -57,7 +59,7 @@ $(document).ready(function() {
             case 'verifying':
             if (activity == "login") {
               if (msg == "WELCOME") {
-                f.innerHTML += "<br/>Connection Established."
+                f.innerHTML += "<br/>You may now interact with the world..."
                 status = "connected";
               } else if (msg == "INVALID" || msg == "UNKNOWN") {
                 f.innerHTML += "<br/>Unable to connect: Invalid login credentials."
@@ -78,86 +80,91 @@ $(document).ready(function() {
               } else if (msg.startsWith("CLANS:")) {
                 f.innerHTML += "<br/>Select Starting Clan"
                 clans = JSON.parse(msg.substring(6))
-                html = "<br/><table class = 'styled-table'><tr><th>Clan</th><th>Description</th></tr>"
+                html = "<br/><table id = 'clanselection' class = 'styled-table'><tr><th>Clan</th><th>Description</th></tr>"
                 for (clan of clans) {
                   html += "<tr onclick = 'send_message(" + clan[0] + ");'><td>" + clan[1] + "</td><td>" + clan[2] + "</td></tr>"
                 }
                 console.log(html)
                 f.innerHTML += html
-              } else if (msg == "WELCOME") {
+              } else if (msg == "SUCCESS") {
                 status = "connected"
                 f.innerHTML += "<br/>Registration Complete."
+                status = "synopsis";
               }
             }
             break;
             default:
-              if (msg.startsWith("NARRATION:")) {
+              if (msg == "WELCOME") {
+                f.innerHTML += "<hr/>You may now interact with the world..."
+                status = "connected"
+              } else if (msg.startsWith("NARRATION:")) {
                 f.innerHTML += `<hr/>${htmlEncode(msg.slice(10))}`;
               } else if (msg.startsWith("STATUS:")){
                 f.innerHTML += `<br/>System Notice: ${htmlEncode(msg.slice(7))}`;
               }
           }
+          f.scrollTop = f.scrollHeight
         };
-
-    const f = document.getElementById("chat-history");
-    f.innerHTML = "AIQuest Console..."
 
     $("#chat-form").submit(async function(e) {
       e.preventDefault();
       input = $("#msg");
       msg = input.val();
       input.val("")
-      if (msg.startsWith("/")) {
-        args = msg.slice(1).split(" ")
-        command = args[0].toUpperCase();
-        switch (command) {
-          case 'CLEAR':
-          f.innerHTML = "AIQuest Console..."
-          return false
-          break;
-          case 'QUIT':
-          ws.close();
-          break;
-          case 'LOGIN':
-          if (status != "connected") {
-            username = args[1]
-            password = args[2]
-            activity = "login"
-            status = "salt"
-            ws = new WebSocket(url);
-            ws.onmessage = onmessage
-            ws.onclose = onclose
-            ws.onopen = async function(event) {
-              await ws.send("AUTH:" + username);
+      if (status != "synopsis") {
+        if (msg.startsWith("/")) {
+          args = msg.slice(1).split(" ")
+          command = args[0].toUpperCase();
+          switch (command) {
+            case 'CLEAR':
+            f.innerHTML = "AIQuest Console..."
+            return false
+            break;
+            case 'QUIT':
+            ws.close();
+            break;
+            case 'LOGIN':
+            if (status != "connected") {
+              username = args[1]
+              password = args[2]
+              activity = "login"
+              status = "salt"
+              ws = new WebSocket(url);
+              ws.onmessage = onmessage
+              ws.onclose = onclose
+              ws.onopen = async function(event) {
+                await ws.send("AUTH:" + username);
+              }
+            } else {
+              f.innerHTML += "<br/>System Notice: Already Connected"
             }
-          } else {
-            f.innerHTML += "<br/>System Notice: Already Connected"
-          }
-          break;
-          case 'REGISTER':
-          if (status != "connected") {
-            username = args[1]
-            password = args[2]
-            activity = "register"
-            status = "salt"
-            ws = new WebSocket(url);
-            ws.onmessage = onmessage
-            ws.onclose = onclose
-            ws.onopen = async function(event) {
-              await ws.send("REGISTER:" + username);
+            break;
+            case 'REGISTER':
+            if (status != "connected") {
+              username = args[1]
+              password = args[2]
+              activity = "register"
+              status = "salt"
+              ws = new WebSocket(url);
+              ws.onmessage = onmessage
+              ws.onclose = onclose
+              ws.onopen = async function(event) {
+                await ws.send("REGISTER:" + username);
+              }
+             } else {
+              f.innerHTML += "<br/>System Notice: Already Connected"
             }
-           } else {
-            f.innerHTML += "<br/>System Notice: Already Connected"
+            break;
+            default:
+            await ws.send("COMMAND:" + command);
+            break;
           }
-          break;
-          default:
-          await ws.send("COMMAND:" + command);
-          break;
+        } else {
+          await ws.send("MSG:" + msg);
         }
-      } else {
-        await ws.send("MSG:" + msg);
+        f.innerHTML += `<br/>${htmlEncode(msg)}`;
+        f.scrollTop = f.scrollHeight
       }
-      f.innerHTML += `<br/>${htmlEncode(msg)}`;
       input.focus();
       return false;
     });

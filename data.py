@@ -45,6 +45,7 @@ def init():
             cur.execute("CREATE TABLE SPELLS (name TEXT NOT NULL, elements TEXT NOT NULL, tier TEXT NOT NULL, cost INT NOT NULL, description TEXT NOT NULL, mishaps TEXT);")
             # Create map tables.
             cur.execute("CREATE TABLE MAPS (realm INT NOT NULL DEFAULT 0, x INT NOT NULL, y INT NOT NULL, last_explored INT NOT NULL DEFAULT -1, description TEXT NOT NULL, items TEXT);")
+            cur.execute("CREATE TABLE SCENARIOS (scenario TEXT NOT NULL);")
             database.commit()
             # Create initial realm.
             realms.create_realm()
@@ -56,6 +57,12 @@ def get_user(user_id):
     global database
     cur = database.cursor()
     res = cur.execute("SELECT username, passwd, salt FROM USERS WHERE rowid = ?;", (user_id, ))
+    return res.fetchone()
+
+def get_user_by_username(username):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT rowid, username, passwd, salt FROM USERS WHERE username = ?;", (username, ))
     return res.fetchone()
 
 def add_user(username, password, salt):
@@ -152,7 +159,7 @@ def get_clan(clan_id, full = False):
     cur = database.cursor()
     print(clan_id)
     if full:
-        res = cur.execute("SELECT name, short_description. long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
+        res = cur.execute("SELECT name, short_description, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     else:
         res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     return res.fetchone()
@@ -170,16 +177,15 @@ def get_character(character_id, full = False):
         sql = """SELECT c.name, cd.clan_id, cd.background, cd.affinities, cl.realm_id, cl.x, cl.y
         FROM characters c
         JOIN character_details cd
-        ON c.user_id = cd.character_id
+        ON c.rowid = cd.character_id
         JOIN character_location cl
         ON cd.character_id = cl.character_id
         WHERE cd.character_id = ?"""
 
-        cursor.execute(sql, (character_id,))
+        res = cur.execute(sql, (character_id,))
     else:
         res = cur.execute("SELECT user_id, name FROM CHARACTERS WHERE rowid = ?;", (character_id, ))
     return res.fetchone()
-
 
 def add_character(clan_id, name, background, affinities, realm_id, x, y, user_id):
     global database
@@ -191,19 +197,16 @@ def add_character(clan_id, name, background, affinities, realm_id, x, y, user_id
     database.commit()
     return character_id
 
-def update_character_location(realm_id, x, y):
+def set_character_location(character_id, realm_id, x, y):
     global database
     cur = database.cursor()
+    cur.execute("UPDATE CHARACTER_LOCATION SET realm_id = ?, x = ?, y = ? WHERE character_id = ?", (realm_id, x, y, character_id, ))
     database.commit()
 
 def update_character_background(character_id, background):
     global database
     cur = database.cursor()
     database.commit()
-
-def get_character(character_id):
-    global database
-    cur = database.cursor()
 
 # Map Data
 def map_initialized(realm = 0):
@@ -223,7 +226,7 @@ def get_map(realm, x, y):
 def add_map(realm, x, y, details):
     global database
     cur = database.cursor()
-    res = cur.execute("INSERT INTO MAPS (realm, x, y, details)", (realm, x, y, details, ))
+    res = cur.execute("INSERT INTO MAPS (realm, x, y, description) VALUES (?, ?, ?, ?)", (realm, x, y, details, ))
     database.commit()
 
 def update_map_details(realm, x, y, details):

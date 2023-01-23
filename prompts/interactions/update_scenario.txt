@@ -1,0 +1,13 @@
+Setting:
+{}
+
+Location:
+{}
+
+Current Scenario: {}
+
+Request: {}
+GM Response: {}
+
+Give an updated scenario based on the request and GM response:
+Updated Scenario:

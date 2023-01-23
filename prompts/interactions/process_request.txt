@@ -1,4 +1,19 @@
 AIQuest is a multiple realm world. Some individuals in this world are able to use elemental magic. Different realms have different levels of technology and science. Realms may include themes from science fiction, fantasy, steampunk, cyberpunk, solarpunk, etc. Overall there are six basic elements in all the realms. However, some elements may be less accessible in certain realms. A realm must be large enough to explore, with numerous different locations.
 
-Generate a realm setting.
 Setting:
+{}
+
+Location:
+{}
+
+Location Items:
+{}
+
+Player Clan: {}
+
+Current Scenario: {}
+
+Request: {}
+
+Respond to player request.
+Response (be narrative):
