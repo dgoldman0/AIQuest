@@ -1,0 +1,16 @@
+Current Setting:
+{}
+
+Location Size: {} by {}
+
+Location Details:
+{}
+
+Item Summary:
+{}
+
+Characters:
+{}
+
+Incorporate location information and item summary into current setting.
+Updated Setting (be narrative):

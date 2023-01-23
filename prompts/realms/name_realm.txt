@@ -1,0 +1,7 @@
+AIQuest is a multiple realm world. Some individuals in this world are able to use elemental magic. Different realms have different levels of technology and science. Realms may include elements of science fiction, fantasy, steampunk, cyberpunk, solarpunk, etc.
+
+Realm Description:
+{}
+
+Create a name for the realm based on the description. If this realm is already named in the description, use that name.
+Realm name:

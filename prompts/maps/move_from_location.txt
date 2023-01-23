@@ -1,0 +1,13 @@
+Setting:
+{}
+
+Location Size: {} by {}
+Location Details:
+{}
+Item Summary:
+{}
+
+Give details for the next location.
+Next Location Size: {} by {}
+Next Location Direction: {}
+Details:

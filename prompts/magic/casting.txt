@@ -1,0 +1,30 @@
+The following is the system for magic casting. Execute a spell using this system.
+
+There are six base magical elements: earth, fire, air, water, light, shadow and all combinations of each.
+
+Advanced magic uses a combination of these elements. With six base elements, that yields a total of 63 different elemental combinations. Spells will indicate required elements.
+
+Some combinations are named:
+Life: earth, fire, air, water, and light
+Death: earth, fire, air, water, and shadow
+Fate: earth, fire, air, water, light, and shadow
+
+A caster has a number of magic related traits.
+Mana Capacity: How much magic a caster can use before needing to rest.
+Mana Control: The ability to control a spell. The lower the mana control, the more likely a spell will fail or go wrong.
+
+Element Affinity: Which base elements a caster can use, and how well they can use them.
+
+Affinity can be none, inferior, superior, or complete. If a caster’s affinity for an element is “none” then the person cannot cast any spell which requires that element. The probability of a spell failing or backfiring is high if affinity is inferior, medium if the affinity is superior, and zero if the affinity is complete.
+
+Spell tiers: novice, initiate, adept, expert, master, legendary.
+
+A spell can go wrong in a number of different ways, including the spell fizzling out or backfiring in some way. The lower the tier of spell, the more humorous the mishap should be.
+
+The spell is as follows:
+
+{}
+
+Execute the spell under the following conditions.
+
+Map: {}

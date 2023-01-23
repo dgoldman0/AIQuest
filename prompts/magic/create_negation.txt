@@ -1,0 +1,44 @@
+The following is the system for magic casting. Create one counter spell based on this system.
+
+There are six base magical elements: earth, fire, air, water, light, shadow and all combinations of each.
+
+Advanced magic uses a combination of these elements. With six base elements, that yields a total of 63 different elemental combinations. Spells will indicate required elements.
+
+Some combinations are named:
+Life: earth, fire, air, water, and light
+Death: earth, fire, air, water, and shadow
+Fate: earth, fire, air, water, light, and shadow
+
+Shadow includes a lot of stealth and poison. Shadow spells cannot heal. High level shadow spells can also slow down the progression of time within a given area. Some shadow spells can cause a negative status effect.
+Light includes a lot of healing. Light spells cannot cause harm. High level light spells can also speed up the progression of time within a given area. Some light spells can remove negative status effects or give a positive status effect.
+Life spells, cannot heal. Life spells govern that which is alive and that which exists. Life spells can kill people and erase things from existence.
+Death spells include necromancy. Death spells govern that which is dead or non-existent. Death spells can bring people back to life, and create things from nothing.
+Fate spells govern destiny. Fate spells can significantly alter the outcome of events. Fate spells can reverse the flow of time.
+
+A caster has a number of magic related traits.
+Mana Capacity: How much magic a caster can use before needing to rest.
+Mana Control: The ability to control a spell. The lower the mana control, the more likely a spell will fail or go wrong.
+
+Element Affinity: Which base elements a caster can use, and how well they can use them.
+
+Affinity can be none, inferior, superior, or complete. If a caster’s affinity for an element is “none” then the person cannot cast any spell which requires that element. The probability of a spell failing or backfiring is high if affinity is inferior, medium if the affinity is superior, and zero if the affinity is complete.
+
+Spell tiers: novice, initiate, adept, expert, master, legendary.
+
+A spell can go wrong in a number of different ways, including the spell fizzling out or backfiring in some way. The lower the tier of spell, the more humorous the mishap should be.
+
+Create a counter spell for the following spell:
+
+{}
+
+Use the following format:
+
+Spell Name:
+
+Required Elements: Element selection should match tier. Use life instead of earth, fire, air, water, light. Use death instead of earth, fire, air, water, shadow. Use fate for earth, fire, air, water, light, and shadow.
+
+Tier: Use the same tier as the original spell.
+
+Mana Cost: This value should a random integer value between the low and high mana cost for the given tier. The mana cost of a spell increases with its tier. Novice spells cost between 10 and 20 mana to cast. Initiate spells cost between 50 and 100 to cast. Adept spells cost between 250 and 500 to cast. Expert spells cost between 1,000 and 2,000 to cast. Master spells cost between 5,000 and 10,000 to cast. And Legendary spells cost between 50,000 and 100,000 to cast.
+
+Description: Describe how this spell negates the original spell. Shadow includes a lot of stealth and poison. Shadow spells cannot heal. High level shadow spells can also slow down the progression of time within a given area. Some shadow spells can cause a negative status effect. Light includes a lot of healing. Light spells cannot cause harm. High level light spells can also speed up the progression of time within a given area. Some light spells can remove negative status effects or give a positive status effect. Life spells, cannot heal. Life spells govern that which is alive and that which exists. Life spells can kill people and erase things from existence. Death spells include necromancy. Death spells govern that which is dead or non-existent. Death spells can bring people back to life, and create things from nothing. Fate spells govern destiny. Fate spells can significantly alter the outcome of events. Fate spells can reverse the flow of time.

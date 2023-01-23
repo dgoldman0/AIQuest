@@ -1,0 +1,10 @@
+Setting:
+{}
+
+Location Size: {} by {}
+Location Details:
+{}
+
+Item Format: Item ID | Item | Description | Location | Dimensions
+
+Summarize items. Be detailed.
