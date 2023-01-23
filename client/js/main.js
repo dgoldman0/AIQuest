@@ -57,12 +57,12 @@ $(document).ready(function() {
             case 'verifying':
             if (activity == "login") {
               if (msg == "WELCOME") {
-                f.innerHTML += "Connection Established."
+                f.innerHTML += "<br/>Connection Established."
                 status = "connected";
               } else if (msg == "INVALID" || msg == "UNKNOWN") {
-                f.innerHTML += "Unable to connect: Invalid login credentials."
+                f.innerHTML += "<br/>Unable to connect: Invalid login credentials."
               } else if (msg == "BLOCKED") {
-                f.innerHTML += "Unable to connect: User is blocked from accessing SAM."
+                f.innerHTML += "<br/>Unable to connect: User is blocked from accessing SAM."
               }
             } else if (activity == "register") {
               // Neither of these tables are disabled after selection. Need to really clean things up properly.
@@ -84,12 +84,15 @@ $(document).ready(function() {
                 }
                 console.log(html)
                 f.innerHTML += html
+              } else if (msg == "WELCOME") {
+                status = "connected"
+                f.innerHTML += "<br/>Registration Complete."
               }
             }
             break;
             default:
-              if (msg.startsWith("MSG:")) {
-                f.innerHTML += `<br/>&lt;SAM&gt;: ${htmlEncode(msg.slice(4))}`;
+              if (msg.startsWith("NARRATION:")) {
+                f.innerHTML += `<hr/>${htmlEncode(msg.slice(10))}`;
               } else if (msg.startsWith("STATUS:")){
                 f.innerHTML += `<br/>System Notice: ${htmlEncode(msg.slice(7))}`;
               }

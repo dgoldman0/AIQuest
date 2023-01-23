@@ -1,0 +1,10 @@
+Character Information:
+Name: {}
+Background: {}
+Clan: {}
+
+Clan Information:
+Description: {}
+
+This character is the player's character. Introduce their character to them.
+Introduction:

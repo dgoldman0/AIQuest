@@ -35,7 +35,7 @@ async def handle_player(websocket, path = None):
                 response = await websocket.recv()
                 if response is not None:
                     if response == user.password:
-                        await websocket.send("WELCOME".encode())
+                        await websocket.send("WELCOME")
             user['websocket'] = websocket
             while True:
                 message = await websocket.recv()
@@ -86,7 +86,8 @@ async def handle_player(websocket, path = None):
                 y = randint(0, 20000000)
                 character_id = characters.generate_character(clan_id, realm_id, x, y, user_id)
                 players.set_websocket(user_id, websockets)
-                players.welcome(user_id)
+                await websocket.send("WELCOME")
+                await players.welcome(user_id, character_id, clan_id, realm_id, x, y)
             else:
                 await websocket.send("EXISTINGUSER")
 

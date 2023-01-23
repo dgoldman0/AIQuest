@@ -52,8 +52,11 @@ def init():
             magic.initialize_spells()
 
 # User Data
-def get_user(username):
-    return None
+def get_user(user_id):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT username, passwd, salt FROM USERS WHERE rowid = ?;", (user_id, ))
+    return res.fetchone()
 
 def add_user(username, password, salt):
     global database
@@ -120,9 +123,9 @@ def get_realmlist():
     res = cur.execute("SELECT rowid, name, setting FROM REALMS;")
     return res.fetchall()
 
-def get_realm(realm_id = 0):
+def get_realm(realm_id = 1):
     cur = database.cursor()
-    res = cur.execute("SELECT name, setting FROM REALMS WHERE rowid = ?;", (realm_id, ))
+    res = cur.execute("SELECT name, setting, history FROM REALMS WHERE rowid = ?;", (realm_id, ))
     return res.fetchone()
 
 # Character Data
@@ -144,12 +147,39 @@ def add_clans(realm_id, clans):
     cur.executemany("INSERT INTO CLANS (realm_id, name, short_description, long_description, affinities) VALUES (" + realm_id + ", ?, ?, ?, ?);", clans)
     database.commit()
 
-def get_clan(clan_id):
+def get_clan(clan_id, full = False):
     global database
     cur = database.cursor()
     print(clan_id)
-    res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
+    if full:
+        res = cur.execute("SELECT name, short_description. long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
+    else:
+        res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     return res.fetchone()
+
+def get_user_character(user_id):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT character_id, name FROM CHARACTERS WHERE user_id = ?;", (user_id, ))
+    return res.fetchone()
+
+def get_character(character_id, full = False):
+    global database
+    cur = database.cursor()
+    if full:
+        sql = """SELECT c.name, cd.clan_id, cd.background, cd.affinities, cl.realm_id, cl.x, cl.y
+        FROM characters c
+        JOIN character_details cd
+        ON c.user_id = cd.character_id
+        JOIN character_location cl
+        ON cd.character_id = cl.character_id
+        WHERE cd.character_id = ?"""
+
+        cursor.execute(sql, (character_id,))
+    else:
+        res = cur.execute("SELECT user_id, name FROM CHARACTERS WHERE rowid = ?;", (character_id, ))
+    return res.fetchone()
+
 
 def add_character(clan_id, name, background, affinities, realm_id, x, y, user_id):
     global database
