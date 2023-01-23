@@ -229,8 +229,33 @@ def add_map(realm, x, y, details):
     res = cur.execute("INSERT INTO MAPS (realm, x, y, description) VALUES (?, ?, ?, ?)", (realm, x, y, details, ))
     database.commit()
 
-def update_map_details(realm, x, y, details):
-    pass
+def update_map_description(realm_id, x, y, description):
+    global database
+    cur = database.cursor()
+    cur.execute("UPDATE MAPS SET description = ? WHERE realm = ? and x = ? and y = ?;", (description, realm_id, x, y, ))
+    database.commit()
 
-def update_map_items(realm, x, y, items):
-    pass
+def update_map_items(realm_id, x, y, items):
+    global database
+    cur = database.cursor()
+    cur.execute("UPDATE MAPS SET items = ? WHERE realm = ? and x = ? and y = ?;", (items, realm_id, x, y, ))
+    database.commit()
+
+def get_scenario():
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT scenario FROM SCENARIOS")
+    resp = res.fetchone()
+    return resp
+
+def update_scenario(scenario):
+    global database
+    cur = database.cursor()
+    cur.execute("UPDATE SCENARIOS SET scenario = ?", (scenario, ))
+    database.commit()
+
+def add_scenario(scenario):
+    global database
+    cur = database.cursor()
+    cur.execute("INSERT INTO SCENARIOS (scenario) VALUES (?);", (scenario, ))
+    database.commit()

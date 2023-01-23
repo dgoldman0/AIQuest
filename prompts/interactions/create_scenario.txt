@@ -1,0 +1,22 @@
+Setting:
+{}
+
+History:
+{}
+
+Location Details:
+{}
+
+Location Items:
+{}
+
+Character Information:
+Name: {}
+Background: {}
+Clan: {}
+
+Clan Information:
+Description: {}
+
+Create scenario centering around this character's current situation. 
+Scenario:

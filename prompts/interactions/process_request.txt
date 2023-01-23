@@ -3,7 +3,7 @@ AIQuest is a multiple realm world. Some individuals in this world are able to us
 Setting:
 {}
 
-Location:
+Location Details:
 {}
 
 Location Items:
@@ -13,7 +13,9 @@ Player Clan: {}
 
 Current Scenario: {}
 
-Request: {}
+Player's Character: {}
+Message: {}
 
-Respond to player request.
-Response (be narrative):
+Respond to player message. Use third person. The response may be can be an answer to a question, interaction with the environment, etc, based on what the message is. If the response progresses the story, keep the story progression to at most one minute of activity. Be narrative.
+
+Response:

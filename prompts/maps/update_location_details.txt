@@ -1,7 +1,7 @@
 Setting:
 {}
 
-Location Details:
+Location:
 {}
 
 Location Items:
@@ -15,5 +15,5 @@ Player's Character: {}
 Message: {}
 Response: {}
 
-Progress scenario based on the player message and GM response:
-Updated Scenario:
+Update the location details based on the player message and GM response.
+Updated Location Details:

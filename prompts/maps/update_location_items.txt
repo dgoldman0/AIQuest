@@ -1,0 +1,20 @@
+Setting:
+{}
+
+Location:
+{}
+
+Location Items:
+{}
+
+Player Clan: {}
+
+Current Scenario: {}
+
+Player's Character: {}
+Message: {}
+Response: {}
+
+Update the location items based on the player message and GM response. Items can be altered, added, removed, etc.
+Updated Location Items:
+Item ID | Item | Description | Location | Dimensions

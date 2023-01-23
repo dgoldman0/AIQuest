@@ -44,7 +44,6 @@ async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     state['clan'] = clan
     state['location'] = location
     # Check if scenario already exists. If not, create one.
-    scenario = data.get_scenario()
     await handle_interactions(user_id)
 
 
@@ -58,17 +57,49 @@ async def handle_interactions(user_id):
     global websockets, user_states, scenario
     state = user_states[user_id]
     websocket = websockets[user_id]
-    await websocket.send("WELCOME")
     # Handle user commands.
+    first = True
     while True:
         character = state['character']
         realm = state['realm']
         clan = state['clan']
         location = state['location']
+        scenario = data.get_scenario()
+        if scenario is None:
+            # setting, history, location details, location items, player's character name, player background, player clan, clan description
+            prompt = generate_prompt("interactions/create_scenario", (realm[1], realm[2], location[1], location[2], character[0], character[2], clan[0], clan[2]))
+            scenario = call_openai(prompt, 512)
+            print("Scenario:" + scenario)
+            data.add_scenario(scenario)
+            prompt = generate_prompt("interactions/summarize_scenario", (scenario, ))
+            summary = call_openai(prompt, 256)
+            await websocket.send("NARRATION:" + summary)
+        if first:
+            first = False
+            await websocket.send("WELCOME")
         message = await websocket.recv()
-        # setting, location, items, clan, request
-        prompt = generate_prompt("interactions/process_request", (realm[1], location[1], location[2], clan[0], scenario, message, ))
+        # setting, location details, items, clan, request
+        prompt = generate_prompt("interactions/process_request", (realm[1], location[1], location[2], clan[0], scenario, character[0], message, ))
         response = call_openai(prompt, 512)
-        print(response)
-        prompt = generate_prompt("interactions/update_scenario")
+        print("Response: " + response)
         await websocket.send("NARRATION:" + response)
+        prompt = generate_prompt("interactions/check_updates", (realm[1], location[1], location[2], clan[0], scenario, character[0], message, response, ))
+        response = call_openai(prompt, 64)
+        row = [column.strip() for column in response.split('|')]
+        print(response)
+        if row[0].lowercase() == "true":
+            prompt = generate_prompt("interactions/update_scenario", (realm[1], location[1], scenario, character[0], message, response, ))
+            scenario = call_openai(prompt, 2048)
+            print("Updated Scenario:" + scenario)
+            data.update_scenario(scenario)
+        if row[1].lowercase() == "true":
+            # This will use the updated scenario as it was set already.
+            prompt = generate_prompt("maps/update_location_details", (realm[1], location[1], scenario, character[0], message, response, ))
+            location[1] = call_openai(prompt, 2048)
+            print("Updated Details:" + location[1])
+            data.update_scenario(scenario)
+        if row[2].lowercase() == "true":
+            # This will use the updated location details as it was set already.
+            prompt = generate_prompt("maps/update_location_items", (realm[1], location[1], scenario, character[0], message, response, ))
+            scenario = call_openai(prompt, 2048)
+            data.update_scenario(scenario)
