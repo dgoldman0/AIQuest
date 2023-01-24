@@ -17,5 +17,5 @@ Player's Character: {}
 Message: {}
 Response: {}
 
-Update the location details based on the player message and GM response.
-Updated Location Details:
+Update scenario based on the player message and GM response:
+Updated Scenario (do not progress the story past what is explained in the response):

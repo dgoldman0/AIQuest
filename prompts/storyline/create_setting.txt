@@ -1,0 +1,18 @@
+Realm Overview:
+{}
+
+History:
+{}
+
+Location Details:
+{}
+
+Location Items:
+Item ID | Item | Description | Location | Dimensions
+{}
+
+Scenario:
+{}
+
+Create a detailed setting including time of day, where the character is in the overall location, etc.
+Setting (three or four paragraphs):

@@ -1,8 +1,9 @@
 Realm Name:
 {}
 
-Realm Setting:
+Realm Overview:
 {}
+
 Realm History:
 {}
 

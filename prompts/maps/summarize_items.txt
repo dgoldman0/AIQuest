@@ -1,4 +1,4 @@
-Setting:
+World Overview:
 {}
 
 Location Size: {} by {}

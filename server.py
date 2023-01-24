@@ -36,8 +36,9 @@ async def handle_player(websocket, path = None):
                 response = await websocket.recv()
                 if response is not None:
                     if response == user[2]:
+                        await websocket.send("SUCCESS")
                         players.set_websocket(user[0], websocket)
-                        await player.load(user[0])
+                        await players.load(user[0])
 
         elif response.startswith("REGISTER:"):
             username = response[9:]

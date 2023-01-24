@@ -11,9 +11,9 @@ def generate_prompt(job, parameters):
     return wrapper(template.format, parameters)
 
 # So far all calls to openai should work with the same parameters so why repeat code?
-def call_openai(prompt, max_tokens = 256):
+def call_openai(prompt, max_tokens = 256, model = "text-davinci-003"):
     openai_response = openai.Completion.create(
-        model="text-davinci-003",
+        model=model,
         temperature=0.7,
         max_tokens=max_tokens,
         top_p=1,

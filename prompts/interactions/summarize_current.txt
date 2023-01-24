@@ -1,0 +1,10 @@
+Scenario:
+{}
+
+Location Details:
+{}
+
+Setting:
+{}
+
+Summarize the current scenario, location, and settings, in narrative form (only include details mentioned):

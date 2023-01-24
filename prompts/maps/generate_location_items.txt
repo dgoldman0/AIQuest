@@ -1,4 +1,4 @@
-Setting:
+World Overview:
 {}
 
 Place {} items in a {} by {} area. Include their location in (x, y) coordinates.

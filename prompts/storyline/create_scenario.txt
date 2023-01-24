@@ -1,4 +1,4 @@
-Setting:
+Realm Overview:
 {}
 
 History:
@@ -18,5 +18,5 @@ Clan: {}
 Clan Information:
 Description: {}
 
-Create scenario centering around this character's current situation. 
+Create scenario centering around this character's current situation.
 Scenario:

@@ -1,0 +1,25 @@
+Determine whether the player's message and/or the GM response alter the items in this location. Has anything changed about the items? For instance, are there new items or have existing items changed state, has the player moved to an area which makes new items visible
+
+World Overview:
+{}
+
+Setting:
+{}
+
+General Location Details:
+{}
+
+Location Items:
+Item ID | Item | Description | Location | Dimensions
+{}
+
+Player Clan: {}
+
+Current Scenario:
+{}
+
+Player's Character: {}
+Player's Message: {}
+GM Response: {}
+
+Based on the player's message and the GM's response, have the items changed (answer as yes or no)?

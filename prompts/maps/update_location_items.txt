@@ -1,17 +1,21 @@
-Setting:
+World Overview:
 {}
 
-Location:
+Location Details:
 {}
 
 Location Items:
+Item ID | Item | Description | Location | Dimensions
 {}
 
-Player Clan: {}
+Current Scenario:
+{}
 
-Current Scenario: {}
+Current Setting:
+{}
 
 Player's Character: {}
+
 Message: {}
 Response: {}
 

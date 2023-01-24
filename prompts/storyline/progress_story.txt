@@ -1,0 +1,37 @@
+Comparison of old scenario, location details, location items, and setting with new information. The new information was generated based off of the player message and the GM response to that message.
+
+Old Scenario:
+{}
+
+New Scenario:
+{}
+
+Old Location Details:
+{}
+
+New Location Details:
+{}
+
+Old Location Items:
+Item ID | Item | Description | Location | Dimensions
+{}
+
+New Location Items:
+Item ID | Item | Description | Location | Dimensions
+{}
+
+Old Setting:
+{}
+
+New Setting:
+{}
+
+Player's Character: {}
+Player Message: {}
+GM Response: {}
+
+Existing Story:
+{}
+
+Extend the existing story to include changes in scenario, location details, location items, and setting settings, resulting from the player's message and the GM's response.
+Updated Story (only include details mentioned):

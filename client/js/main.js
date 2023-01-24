@@ -58,8 +58,8 @@ $(document).ready(function() {
             break;
             case 'verifying':
             if (activity == "login") {
-              if (msg == "WELCOME") {
-                f.innerHTML += "<br/>You may now interact with the world..."
+              if (msg == "SUCCESS") {
+                f.innerHTML += "<br/>Authentication successful..."
                 status = "connected";
               } else if (msg == "INVALID" || msg == "UNKNOWN") {
                 f.innerHTML += "<br/>Unable to connect: Invalid login credentials."

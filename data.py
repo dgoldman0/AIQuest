@@ -23,6 +23,7 @@ def init():
             print("First initialization...")
             # Create user tables.
             cur.execute("CREATE TABLE USERS (username TEXT NOT NULL, passwd TEXT NOT NULL, salt TEXT NOT NULL, admin INT DEFAULT FALSE);")
+            cur.execute("CREATE TABLE USER_INFO (user_id INT NOT NULL, current_setting TEXT, story TEXT);")
 #            username = input("Desired username: ")
 #            password1 = ""
 #            password2 = None
@@ -70,8 +71,21 @@ def add_user(username, password, salt):
     cur = database.cursor()
     cur.execute("INSERT INTO USERS (username, passwd, salt, admin) VALUES (?, ?, ?, FALSE);", (username, password, salt))
     id = cur.lastrowid
+    cur.execute("INSERT INTO USER_INFO (user_id) VALUES (?)", (id, ))
     database.commit()
     return id
+
+def get_current_setting(user_id):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT current_setting FROM USER_INFO WHERE user_id = ?;", (user_id, ))
+    return res.fetchone()[0]
+
+def update_current_setting(user_id, setting):
+    global database
+    cur = database.cursor()
+    cur.execute("UPDATE USER_INFO SET current_setting = ? WHERE user_id = ?", (setting, user_id, ))
+    database.commit()
 
 # Realm Data
 def add_realm(name, setting, history):
@@ -85,14 +99,14 @@ def add_realm(name, setting, history):
 def get_setting(realm = 1):
     global database
     cur = database.cursor()
-    res = cur.execute("SELECT setting FROM REALM WHERE rowid = ?;", (realm, ))
-    return res.fetchone()
+    res = cur.execute("SELECT setting FROM REALMS WHERE rowid = ?;", (realm, ))
+    return res.fetchone()[0]
 
 def get_history(realm = 1):
     global database
     cur = database.cursor()
-    res = cur.execute("SELECT setting FROM REALM WHERE rowid = ?;", (realm, ))
-    return res.fetchone()
+    res = cur.execute("SELECT history FROM REALMS WHERE rowid = ?;", (realm, ))
+    return res.fetchone()[0]
 
 # Spell Data
 def add_spell(spell):
@@ -164,10 +178,20 @@ def get_clan(clan_id, full = False):
         res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     return res.fetchone()
 
-def get_user_character(user_id):
+def get_user_character(user_id, full = False):
     global database
     cur = database.cursor()
-    res = cur.execute("SELECT character_id, name FROM CHARACTERS WHERE user_id = ?;", (user_id, ))
+    if full:
+        sql = """SELECT c.name, cd.clan_id, cd.background, cd.affinities, cl.realm_id, cl.x, cl.y
+        FROM characters c
+        JOIN character_details cd
+        ON c.rowid = cd.character_id
+        JOIN character_location cl
+        ON cd.character_id = cl.character_id
+        WHERE c.user_id = ?"""
+        res = cur.execute(sql, (user_id,))
+    else:
+        res = cur.execute("SELECT user_id, name FROM CHARACTERS WHERE rowid = ?;", (character_id, ))
     return res.fetchone()
 
 def get_character(character_id, full = False):
@@ -245,8 +269,7 @@ def get_scenario():
     global database
     cur = database.cursor()
     res = cur.execute("SELECT scenario FROM SCENARIOS")
-    resp = res.fetchone()
-    return resp
+    return res.fetchone()[0]
 
 def update_scenario(scenario):
     global database
@@ -258,4 +281,16 @@ def add_scenario(scenario):
     global database
     cur = database.cursor()
     cur.execute("INSERT INTO SCENARIOS (scenario) VALUES (?);", (scenario, ))
+    database.commit()
+
+def get_story(user_id):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT story FROM USER_INFO WHERE user_id = ?", (user_id, ))
+    return res.fetchone()[0]
+
+def update_story(user_id, story):
+    global database
+    cur = database.cursor()
+    cur.execute("UPDATE USER_INFO SET story = ? WHERE user_id = ?", (story, user_id, ))
     database.commit()
