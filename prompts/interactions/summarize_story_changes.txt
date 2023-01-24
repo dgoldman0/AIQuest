@@ -1,9 +1,9 @@
 The story has progressed.
 
-Existing story:
+Existing setting:
 {}
 
-Updated story:
+Updated setting:
 {}
 
-Summarize changes to the story, in narrative form: 
+Summarize changes to the setting, in narrative form:

@@ -17,5 +17,5 @@ Player's Character: {}
 Message: {}
 Response: {}
 
-Update setting based on the player message and GM response:
-Updated Setting (two or three paragraphs):
+Update setting based on the player message and GM response (allow the player to make decisions about their own actions):
+Updated Setting (three or four paragraphs):

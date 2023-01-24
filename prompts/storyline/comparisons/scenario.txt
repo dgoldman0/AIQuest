@@ -1,0 +1,7 @@
+Previous Scenario:
+{}
+
+Updated Scenario:
+{}
+
+What are the changes between the previous scenario and the updated scenario?
