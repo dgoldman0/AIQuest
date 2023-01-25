@@ -40,6 +40,6 @@ def call_openai(prompt, max_tokens = 256, model = "text-davinci-003"):
     print("\n\nResponse:\n" + response)
     return response
 
-def generate_image(prompt, size = "512x512"):
+def generate_image(prompt, size = "256x256"):
     url = openai.Image.create(prompt=prompt, size=size)['data'][0]['url']
     return url

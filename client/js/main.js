@@ -94,6 +94,11 @@ $(document).ready(function() {
             case 'waiting':
             if (msg == "FINISHED") {
               status = "active"
+            } else {
+              if (msg.startsWith("NARRATION:")) {
+                converter = new showdown.Converter()
+                f.innerHTML += `<hr/><div class = "narration-block">${converter.makeHtml(msg.slice(10))}</div>`;
+              }
             }
             break;
             default:
@@ -102,7 +107,7 @@ $(document).ready(function() {
               status = "active"
             } else if (msg.startsWith("NARRATION:")) {
               converter = new showdown.Converter()
-              f.innerHTML += `<hr/>${converter.makeHtml(msg.slice(10))}`;
+              f.innerHTML += `<hr/><div class = "narration-block">${converter.makeHtml(msg.slice(10))}</div>`;
             } else if (msg.startsWith("STATUS:")){
               f.innerHTML += `<hr/>System Notice: ${htmlEncode(msg.slice(7))}`;
             }

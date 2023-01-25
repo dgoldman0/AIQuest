@@ -1,4 +1,4 @@
-Determine whether the player's message and/or the GM response alter the general details in this location. Changes to items might be caused by player interaction, other characters altering the items, damage to items, the items doing things on their own, etc.
+Determine whether the player's message and/or the GM response alter the general details in this location. General location details include things like buildings and other structures. 
 
 World Overview:
 {}

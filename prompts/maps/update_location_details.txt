@@ -1,10 +1,8 @@
-World Overview:
-{}
-
 Location Details:
 {}
 
 Location Items:
+Item ID | Item | Description | Location | Dimensions
 {}
 
 Current Scenario:
@@ -18,4 +16,5 @@ Message: {}
 Response: {}
 
 Update the location details based on the player message and GM response.
+Format:
 Updated Location Details || List of Changes (in order that they occur)

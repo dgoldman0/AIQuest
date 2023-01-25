@@ -104,12 +104,14 @@ async def handle_interactions(user_id):
         if first:
             first = False
             # Change to a summary that includes scenario, location, setting, etc.
-            prompt = generate_prompt("interactions/summarize_current", (setting, location[1], setting))
+            prompt = generate_prompt("interactions/summarize_current", (scenario, location[1], setting))
             summary = call_openai(prompt, 256)
-            image_url = generate_image()
-            await websocket.send("NARRATION:" + summary)
+            prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
+            image_prompt = call_openai(prompt, 245)
+            image_url = generate_image(image_prompt)
+            await websocket.send("NARRATION:" + summary + "![Current](" + image_url + ")")
             await websocket.send("WELCOME")
-        message = await websocket.recv()
+        message = await websocket.recv()[4:]
         # Eventually change process_request so that it's a decider that will select between different message processors depending on the message details.
         # setting, location details, items, clan, request
         prompt = generate_prompt("interactions/process_request", (realm[1], location[1], location[2], clan[0], scenario, setting, character[0], message, ))
@@ -149,7 +151,7 @@ async def handle_interactions(user_id):
         if response.lower().startswith("yes"):
             changed = True
             # Should do a sanity check on items to make sure the dimensions make sense.
-            prompt = generate_prompt("maps/update_location_items", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
+            prompt = generate_prompt("maps/update_location_items", (location[1], location[2], scenario, setting, character[0], message, gm_response, ))
             response = None
             while response is None:
                 response = call_openai(prompt, 1024)
@@ -169,7 +171,7 @@ async def handle_interactions(user_id):
         response = call_openai(prompt, 32)
         if response.lower().startswith("yes"):
             changed = True
-            prompt = generate_prompt("maps/update_location_details", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
+            prompt = generate_prompt("maps/update_location_details", (location[1], location[2], scenario, setting, character[0], message, gm_response, ))
             response = None
             while response is None:
                 response = call_openai(prompt, 1024)
@@ -179,7 +181,7 @@ async def handle_interactions(user_id):
                     response = response.split("Changes:")
             location[1] = response[0].strip()
             location_progression = response[1].strip()
-            data.update_map_description(realm_id, x, y, details)
+            data.update_map_description(realm_id, x, y, location[1])
         else:
             details_progression = "None"
 
@@ -208,7 +210,7 @@ async def handle_interactions(user_id):
         data.update_story(user_id, response)
         if changed:
             prompt = generate_prompt("interactions/narrate_developments", (story, scenario_progression, details_progression, items_progression, setting_progression, ))
-            response = call_openai(prompt, 512)
+            response = call_openai(prompt, 800)
             await websocket.send("NARRATION:" + response)
         else:
             await websocket.send("NARRATION:" + gm_response)
