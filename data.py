@@ -46,6 +46,7 @@ def init():
             cur.execute("CREATE TABLE SPELLS (name TEXT NOT NULL, elements TEXT NOT NULL, tier TEXT NOT NULL, cost INT NOT NULL, description TEXT NOT NULL, mishaps TEXT);")
             # Create map tables.
             cur.execute("CREATE TABLE MAPS (realm INT NOT NULL DEFAULT 0, x INT NOT NULL, y INT NOT NULL, last_explored INT NOT NULL DEFAULT -1, description TEXT NOT NULL, items TEXT);")
+            # Will eventually have multiple scenarios for different groups, etc.
             cur.execute("CREATE TABLE SCENARIOS (scenario TEXT NOT NULL);")
             database.commit()
             # Create initial realm.
@@ -269,7 +270,9 @@ def get_scenario():
     global database
     cur = database.cursor()
     res = cur.execute("SELECT scenario FROM SCENARIOS")
-    return res.fetchone()[0]
+    resp = res.fetchone()
+    if resp is None: return None
+    return resp[0]
 
 def update_scenario(scenario):
     global database
