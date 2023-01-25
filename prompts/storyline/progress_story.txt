@@ -14,4 +14,4 @@ Setting Developments:
 {}
 
 Take the existing story and extend it, by adding what developments in scenario, location details, location items, and setting to it, without making anything new up.
-Expanded story:
+Expanded story (be narrative and do not add details not mentioned already):

@@ -1,3 +1,0 @@
-Place 20 items in a {} by {} area. Include their location in (x, y) coordinates.
-
-Use the following format: Item ID | Item | Description | Location | Dimensions (cm)

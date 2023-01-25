@@ -20,7 +20,7 @@ def call_openai(prompt, max_tokens = 256, model = "text-davinci-003"):
     response = None
     while response is None:
         try:
-            openai_response = openai.Completion.create(
+            completion = openai.Completion.create(
                 model=model,
                 temperature=0.7,
                 max_tokens=max_tokens,
@@ -28,7 +28,6 @@ def call_openai(prompt, max_tokens = 256, model = "text-davinci-003"):
                 frequency_penalty=0.1,
                 presence_penalty=0,
                 prompt=prompt)
-            completion = openai_response
             response = completion["choices"][0]["text"].strip()
             tokens = completion['usage']['total_tokens']
             token_use += tokens
@@ -41,5 +40,23 @@ def call_openai(prompt, max_tokens = 256, model = "text-davinci-003"):
     return response
 
 def generate_image(prompt, size = "256x256"):
-    url = openai.Image.create(prompt=prompt, size=size)['data'][0]['url']
+    url = None
+    while url is None:
+        try:
+            url = openai.Image.create(prompt=prompt, size=size)['data'][0]['url']
+        except Exception as e:
+            if str(e) == "openai.error.InvalidRequestError: Your request was rejected as a result of our safety system. Your prompt may contain text that is not allowed by our safety system.":
+                # Rephrase
+                print("Rephrasing image prompt...")
+                completion = openai.Completion.create(
+                    model=model,
+                    temperature=0.7,
+                    max_tokens=max_tokens,
+                    top_p=1,
+                    frequency_penalty=0.1,
+                    presence_penalty=0,
+                    prompt="Rephrase: " + prompt + '\n')
+                prompt = completion["choices"][0]["text"].strip()
+                tokens = completion['usage']['total_tokens']
+                token_use += tokens
     return url

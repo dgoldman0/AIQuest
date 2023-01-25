@@ -7,4 +7,4 @@ Location Details:
 Setting:
 {}
 
-Summarize the current scenario, location, and settings, in narrative form (only include details mentioned):
+Summarize the current scenario, location, and settings, in narrative form (two to three paragraphs):

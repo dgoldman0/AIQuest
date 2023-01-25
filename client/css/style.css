@@ -208,8 +208,8 @@ i.fas.fa-paper-plane{
 	padding: 5px;
 	height: 40px;
 	width: 100%;
-    border-radius: 3px;
-
+  border-radius: 3px;
+	float: right;
 }
 
 .join-main input[type='email']  {
@@ -277,4 +277,15 @@ i.fas.fa-paper-plane{
 .styled-table tbody tr:hover {
     font-weight: bold;
     color: #009879;
+}
+
+.narration-block {
+	overflow: hidden
+}
+
+.narration-block img {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	padding: 5px;
+  width: 250px;
+	float: right;
 }

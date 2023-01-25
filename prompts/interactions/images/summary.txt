@@ -8,6 +8,4 @@ Location Items:
 Item ID | Item | Description | Location | Dimensions
 {}
 
-Summarize the setting, location details, and location items, in one paragraph.
-
-Summary:
+Describe what is seen.
