@@ -289,3 +289,5 @@ i.fas.fa-paper-plane{
   width: 250px;
 	float: right;
 }
+
+p:first-letter { font-size: 3em; }
