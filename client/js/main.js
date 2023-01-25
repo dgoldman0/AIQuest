@@ -59,12 +59,12 @@ $(document).ready(function() {
             case 'verifying':
             if (activity == "login") {
               if (msg == "SUCCESS") {
-                f.innerHTML += "<br/>Authentication successful..."
+                f.innerHTML += "<hr/>Authentication successful..."
                 status = "connected";
               } else if (msg == "INVALID" || msg == "UNKNOWN") {
-                f.innerHTML += "<br/>Unable to connect: Invalid login credentials."
+                f.innerHTML += "<hr/>Unable to connect: Invalid login credentials."
               } else if (msg == "BLOCKED") {
-                f.innerHTML += "<br/>Unable to connect: User is blocked from accessing SAM."
+                f.innerHTML += "<hr/>Unable to connect: User is blocked from accessing SAM."
               }
             } else if (activity == "register") {
               // Neither of these tables are disabled after selection. Need to really clean things up properly.
@@ -75,7 +75,6 @@ $(document).ready(function() {
                 for (realm of realms) {
                   html += "<tr onclick = 'send_message(" + realm[0] + ");'><td>" + realm[1] + "</td><td>" + realm[2] + "</td></tr>"
                 }
-                console.log(html)
                 f.innerHTML += html
               } else if (msg.startsWith("CLANS:")) {
                 f.innerHTML += "<br/>Select Starting Clan"
@@ -84,24 +83,29 @@ $(document).ready(function() {
                 for (clan of clans) {
                   html += "<tr onclick = 'send_message(" + clan[0] + ");'><td>" + clan[1] + "</td><td>" + clan[2] + "</td></tr>"
                 }
-                console.log(html)
                 f.innerHTML += html
               } else if (msg == "SUCCESS") {
                 status = "connected"
-                f.innerHTML += "<br/>Registration Complete."
+                f.innerHTML += "<hr/>Registration Complete."
                 status = "synopsis";
               }
             }
             break;
+            case 'waiting':
+            if (msg == "FINISHED") {
+              status = "active"
+            }
+            break;
             default:
-              if (msg == "WELCOME") {
-                f.innerHTML += "<hr/>You may now interact with the world..."
-                status = "connected"
-              } else if (msg.startsWith("NARRATION:")) {
-                f.innerHTML += `<hr/>${htmlEncode(msg.slice(10))}`;
-              } else if (msg.startsWith("STATUS:")){
-                f.innerHTML += `<br/>System Notice: ${htmlEncode(msg.slice(7))}`;
-              }
+            if (msg == "WELCOME") {
+              f.innerHTML += "<hr/>You may now interact with the world..."
+              status = "active"
+            } else if (msg.startsWith("NARRATION:")) {
+              converter = new showdown.Converter()
+              f.innerHTML += `<hr/>${converter.makeHtml(msg.slice(10))}`;
+            } else if (msg.startsWith("STATUS:")){
+              f.innerHTML += `<hr/>System Notice: ${htmlEncode(msg.slice(7))}`;
+            }
           }
           f.scrollTop = f.scrollHeight
         };
@@ -111,7 +115,7 @@ $(document).ready(function() {
       input = $("#msg");
       msg = input.val();
       input.val("")
-      if (status != "synopsis") {
+      if (status != "synopsis" && status != "waiting") {
         if (msg.startsWith("/")) {
           args = msg.slice(1).split(" ")
           command = args[0].toUpperCase();
@@ -158,12 +162,15 @@ $(document).ready(function() {
             default:
             await ws.send("COMMAND:" + command);
             break;
+            f.innerHTML += `<hr/>COMMAND: ${htmlEncode(msg.substring(1))}`;
+            f.scrollTop = f.scrollHeight
           }
         } else {
+          status = "waiting"
+          f.innerHTML += `<hr/>Player: ${htmlEncode(msg)}`;
+          f.scrollTop = f.scrollHeight
           await ws.send("MSG:" + msg);
         }
-        f.innerHTML += `<br/>${htmlEncode(msg)}`;
-        f.scrollTop = f.scrollHeight
       }
       input.focus();
       return false;
