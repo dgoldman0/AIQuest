@@ -20,5 +20,5 @@ Message: {}
 Response: {}
 
 Update the location items based on the player message and GM response. Items can be altered, added, removed, etc.
-Updated Location Items:
+Updated Location Items || List of Changes (in order that they occur)
 Item ID | Item | Description | Location | Dimensions

@@ -46,7 +46,7 @@ def init():
             cur.execute("CREATE TABLE SPELLS (name TEXT NOT NULL, elements TEXT NOT NULL, tier TEXT NOT NULL, cost INT NOT NULL, description TEXT NOT NULL, mishaps TEXT);")
             # Create map tables.
             cur.execute("CREATE TABLE MAPS (realm INT NOT NULL DEFAULT 0, x INT NOT NULL, y INT NOT NULL, last_explored INT NOT NULL DEFAULT -1, description TEXT NOT NULL, items TEXT);")
-            # Will eventually have multiple scenarios for different groups, etc.
+            # Will eventually have multiple scenarios for different groups, etc. User_INFO and scenarios will be merged and altered to handle multiple players, etc.
             cur.execute("CREATE TABLE SCENARIOS (scenario TEXT NOT NULL);")
             database.commit()
             # Create initial realm.

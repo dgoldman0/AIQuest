@@ -18,4 +18,4 @@ Message: {}
 Response: {}
 
 Update scenario based on the player message and GM response:
-Updated Scenario (do not progress the story past what is explained in the response):
+Updated Scenario (do not progress the story past what is explained in the response) || List of Changes (in order that they occur)

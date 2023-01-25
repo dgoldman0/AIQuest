@@ -18,4 +18,4 @@ Message: {}
 Response: {}
 
 Update the location details based on the player message and GM response.
-Updated Location Details:
+Updated Location Details || List of Changes (in order that they occur)

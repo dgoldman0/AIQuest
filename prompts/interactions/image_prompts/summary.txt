@@ -1,0 +1,11 @@
+Setting:
+
+Location Details:
+{}
+
+Location Items:
+Item ID | Item | Description | Location | Dimensions
+{}
+
+Describe the setting, location details, and items.
+Description (short):

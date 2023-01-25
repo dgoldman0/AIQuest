@@ -1,5 +1,6 @@
 from generation import generate_prompt
 from generation import call_openai
+from generation import generate_image
 import maps
 
 users = []
@@ -54,7 +55,6 @@ async def load(user_id):
     websocket = websockets[user_id]
     # Load settings from previous state.
     character = data.get_user_character(user_id, True)
-    print(character)
     realm_id = character[4]
     clan_id = character[1]
     x = character[5]
@@ -93,12 +93,10 @@ async def handle_interactions(user_id):
             # setting, history, location details, location items, player's character name, player background, player clan, clan description
             prompt = generate_prompt("storyline/create_scenario", (realm[1], realm[2], location[1], location[2], character[0], character[2], clan[0], clan[2]))
             scenario = call_openai(prompt, 256)
-            print("Scenario:" + scenario)
             data.add_scenario(scenario)
         if setting is None:
             prompt = generate_prompt("storyline/create_setting", (realm[1], realm[2], location[1], location[2], scenario, ))
             setting = call_openai(prompt, 400)
-            print("Setting:" + setting)
             data.update_current_setting(user_id, setting)
         if story is None:
             story = scenario
@@ -107,7 +105,8 @@ async def handle_interactions(user_id):
             first = False
             # Change to a summary that includes scenario, location, setting, etc.
             prompt = generate_prompt("interactions/summarize_current", (setting, location[1], setting))
-            summary = call_openai(prompt, 128)
+            summary = call_openai(prompt, 256)
+            image_url = generate_image()
             await websocket.send("NARRATION:" + summary)
             await websocket.send("WELCOME")
         message = await websocket.recv()
@@ -115,7 +114,6 @@ async def handle_interactions(user_id):
         # setting, location details, items, clan, request
         prompt = generate_prompt("interactions/process_request", (realm[1], location[1], location[2], clan[0], scenario, setting, character[0], message, ))
         gm_response = call_openai(prompt, 256)
-        print("Response: " + gm_response)
         # Check update for setting, location items, location details, and
         # Check update might work well in Curie in which case I could save a few cents.
         setting_progression = None
@@ -128,63 +126,79 @@ async def handle_interactions(user_id):
         old_setting = setting
         prompt = generate_prompt("logic/check_update_setting", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
         response = call_openai(prompt, 32)
-        print("Update Setting: " + response)
         if response.lower().startswith("yes"):
             changed = True
-            prompt = generate_prompt("characters/update_setting", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
-            response = call_openai(prompt, 1024)
-            print("\n\nPrompt:\n" + response)
-            return
-#            setting =
-#            setting_progression =
-#            data.update_current_setting(user_id, setting)
+            # This is pushing out way too many changes.
+            prompt = generate_prompt("storyline/update_setting", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
+            response = None
+            while response is None:
+                response = call_openai(prompt, 1024)
+                if response.find("List of Changes:") != -1:
+                    response = response.split("List of Changes:")
+                elif response.find("Changes:") != -1:
+                    response = response.split("Changes:")
+            setting = response[0].strip()
+            setting_progression = response[1].strip()
+            data.update_current_setting(user_id, setting)
         else:
             setting_progression = "None"
 
         old_items = location[2]
         prompt = generate_prompt("logic/check_update_items", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
         response = call_openai(prompt, 32)
-        print("Update Items: " + response)
         if response.lower().startswith("yes"):
             changed = True
             # Should do a sanity check on items to make sure the dimensions make sense.
             prompt = generate_prompt("maps/update_location_items", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
-            items = call_openai(prompt, 1024)
+            response = None
+            while response is None:
+                response = call_openai(prompt, 1024)
+                if response.find("List of Changes:") != -1:
+                    response = response.split("List of Changes:")
+                elif response.find("Changes:") != -1:
+                    response = response.split("Changes:")
+            items = response[0].strip()
+            response_progression = response[1].strip()
             data.update_map_items(realm_id, x, y, items)
             data.update_current_setting(user_id, setting)
-            prompt = generate_prompt("storyline/comparisons/items", (old_items, items, ))
-            items_progression = call_openai(prompt, 1024)
         else:
             items_progression = "None"
 
         old_details = location[1]
         prompt = generate_prompt("logic/check_update_details", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
         response = call_openai(prompt, 32)
-        print("Update Details: " + response)
         if response.lower().startswith("yes"):
             changed = True
             prompt = generate_prompt("maps/update_location_details", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
-            details = call_openai(prompt, 256)
-            location[1] = details
-            print("\nUpdated Details:" + details)
+            response = None
+            while response is None:
+                response = call_openai(prompt, 1024)
+                if response.find("List of Changes:") != -1:
+                    response = response.split("List of Changes:")
+                elif response.find("Changes:") != -1:
+                    response = response.split("Changes:")
+            location[1] = response[0].strip()
+            location_progression = response[1].strip()
             data.update_map_description(realm_id, x, y, details)
-            prompt = generate_prompt("storyline/comparisons/details", (old_details, details, ))
-            details_progression = call_openai(prompt, 256)
         else:
             details_progression = "None"
 
         old_scenario = scenario
         prompt = generate_prompt("logic/check_update_scenario", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
         response = call_openai(prompt, 32)
-        print("Update Scenario: " + response)
         if response.lower().startswith("yes"):
             changed = True
             prompt = generate_prompt("storyline/update_scenario", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
-            scenario = call_openai(prompt, 256)
-            print("\nUpdated Scenario:" + scenario)
+            response = None
+            while response is None:
+                response = call_openai(prompt, 1024)
+                if response.find("List of Changes:") != -1:
+                    response = response.split("List of Changes:")
+                elif response.find("Changes:") != -1:
+                    response = response.split("Changes:")
+            scenario = response[0].strip()
+            scenario_progression = response[1].strip()
             data.update_scenario(scenario)
-            prompt = generate_prompt("storyline/comparisons/items", (old_scenario, scenario, ))
-            scenario_progression = call_openai(prompt, 256)
         else:
             scenario_progression = "None"
 
@@ -194,7 +208,7 @@ async def handle_interactions(user_id):
         data.update_story(user_id, response)
         if changed:
             prompt = generate_prompt("interactions/narrate_developments", (story, scenario_progression, details_progression, items_progression, setting_progression, ))
-            response = call_openai(prompt, 256)
+            response = call_openai(prompt, 512)
             await websocket.send("NARRATION:" + response)
         else:
             await websocket.send("NARRATION:" + gm_response)
