@@ -45,7 +45,7 @@ def generate_image(prompt, size = "256x256"):
         try:
             url = openai.Image.create(prompt=prompt, size=size)['data'][0]['url']
         except Exception as e:
-            if str(e) == "openai.error.InvalidRequestError: Your request was rejected as a result of our safety system. Your prompt may contain text that is not allowed by our safety system.":
+            if str(e) == "Your request was rejected as a result of our safety system. Your prompt may contain text that is not allowed by our safety system.":
                 # Rephrase
                 print("Rephrasing image prompt...")
                 completion = openai.Completion.create(
@@ -59,4 +59,6 @@ def generate_image(prompt, size = "256x256"):
                 prompt = completion["choices"][0]["text"].strip()
                 tokens = completion['usage']['total_tokens']
                 token_use += tokens
+            else:
+                print(e)
     return url
