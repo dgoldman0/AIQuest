@@ -19,7 +19,7 @@ Player Characters:
 A new message has been received by {}.
 Message: {}
 
-Give a new GM response based on the new message and the existing discussion. If the players have made their decisions for the around, respond with "Ready."
+Players are coordinating what to do next. Give a new GM response based on the new message and the existing discussion. Allow players to make decisions about their own character's behavior.
 
 Existing discussion between the players and the GM for the current round:
 {}

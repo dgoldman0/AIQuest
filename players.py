@@ -123,7 +123,7 @@ async def handle_interactions(user_id):
             gm_response = call_openai(prompt, 256)
             discussion += character[0] + ": " + message + '\n'
             discussion += "GM Response: " + gm_response
-            if gm_response == "Ready.":
+            if gm_response == "Ready." and False:
                 # setting, location details, items, clan, request
                 prompt = generate_prompt("interactions/evaluate_discussion", (realm[1], location[1], location[2], scenario, setting, players, discussion, ))
                 gm_response = call_openai(prompt, 256)
