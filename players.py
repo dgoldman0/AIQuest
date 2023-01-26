@@ -126,7 +126,7 @@ async def handle_interactions(user_id):
             prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, discussion, ))
             gm_response = call_openai(prompt, 256)
             discussion += character[0] + ": " + message + '\n'
-            discussion += "GM Response: " + gm_response
+            discussion += "GM Response: " + gm_response + '\n'
             prompt = generate_prompt("logic/evaluate_still_coordinating", (players, discussion, ))
             still_coordinating = call_openai(prompt, 32)
             if still_coordinating.lower().startswith("no"):
@@ -220,6 +220,7 @@ async def handle_interactions(user_id):
                 old_story = story
                 prompt = generate_prompt("storyline/progress_story", (story, scenario_progression, details_progression, items_progression, setting_progression, ))
                 response = call_openai(prompt, 1024)
+                discussion = ""
                 data.update_story(user_id, response)
                 if changed:
                     prompt = generate_prompt("interactions/narrate_developments", (story, scenario_progression, details_progression, items_progression, setting_progression, ))
