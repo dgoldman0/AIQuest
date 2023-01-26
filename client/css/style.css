@@ -290,10 +290,10 @@ i.fas.fa-paper-plane{
 	float: right;
 }
 
-@@font-face {
+@font-face {
 	font-family: "Awery";
 	src: local("Awery"),
-		url("fonts/Awery.ttf")
+		url("../fonts/Awery.ttf")
 }
 .narration-block p: {
 	font-family: 'Awery', Arial, sans-serif;
