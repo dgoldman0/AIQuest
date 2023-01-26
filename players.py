@@ -109,8 +109,12 @@ async def handle_interactions(user_id):
             # Change to a summary that includes scenario, location, setting, etc.
             prompt = generate_prompt("interactions/summarize_current", (scenario, location[1], setting))
             summary = call_openai(prompt, 512)
-            prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
-            image_prompt = call_openai(prompt, 245)
+            image_prompt = None
+            while image_prompt is None:
+                prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
+                summary = call_openai(prompt, 245)
+                if len(summary) < 1000:
+                    image_prompt = summary
             image_url = generate_image(image_prompt)
             await websocket.send("NARRATION:![Current](" + image_url + ")" + summary.replace('\n', '\n\n'))
             await websocket.send("WELCOME")
@@ -123,6 +127,8 @@ async def handle_interactions(user_id):
             gm_response = call_openai(prompt, 256)
             discussion += character[0] + ": " + message + '\n'
             discussion += "GM Response: " + gm_response
+            prompt = generate_prompt("interactions/evaluate_discussion", (realm[1], location[1], location[2], scenario, setting, players, discussion, ))
+            gm_response = call_openai(prompt, 256)
             if gm_response == "Ready." and False:
                 # setting, location details, items, clan, request
                 prompt = generate_prompt("interactions/evaluate_discussion", (realm[1], location[1], location[2], scenario, setting, players, discussion, ))

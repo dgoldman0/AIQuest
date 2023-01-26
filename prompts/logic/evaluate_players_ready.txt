@@ -1,5 +1,3 @@
-Respond to the player's message.
-
 World Overview:
 {}
 
@@ -10,7 +8,8 @@ Location Items:
 Item ID | Item | Description | Location | Dimensions
 {}
 
-Current Scenario: {}
+Current Scenario:
+{}
 
 Setting:
 {}
@@ -19,5 +18,6 @@ Player Characters:
 {}
 
 Discussion:
+{}
 
-Evaluate the discussion between the players and the GM and determine the series of events that follows.
+Do the players appear to be in agreement about what to do next (yes or no)?

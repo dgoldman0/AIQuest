@@ -16,10 +16,10 @@ Setting:
 Player Characters:
 {}
 
+Players are coordinating what to do next. Give a new GM response based on the new message and the existing discussion. Do not make decisions about the behavior of player characters.
+
 A new message has been received by {}.
 Message: {}
-
-Players are coordinating what to do next. Give a new GM response based on the new message and the existing discussion. Allow players to make decisions about their own character's behavior.
 
 Existing discussion between the players and the GM for the current round:
 {}
