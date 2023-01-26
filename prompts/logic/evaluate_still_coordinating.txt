@@ -6,6 +6,4 @@ Player Characters:
 Discussion:
 {}
 
-Are the players still asking questions and coordinating what to do next, or have they decided to act?
-
-Yes the players are still asking questions and coordinating, or no the players have decided to act:
+Are the players still asking questions and coordinating what to do next?

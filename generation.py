@@ -49,7 +49,7 @@ def generate_image(prompt, size = "256x256"):
                 # Rephrase
                 print("Rephrasing image prompt...")
                 completion = openai.Completion.create(
-                    model=model,
+                    model="text-davinci-003",
                     temperature=0.7,
                     max_tokens=max_tokens,
                     top_p=1,
