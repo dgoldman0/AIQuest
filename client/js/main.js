@@ -23,14 +23,9 @@ $(document).ready(function() {
 
   if ("WebSocket" in window) {
     onclose = function(event) {
-      if (event.wasClean) {
-        status = "connecting"
-        activity = null;
-      } else {
-        // e.g. server process killed or network down
-        // event.code is usually 1006 in this case
-        console.log('[close] Connection died');
-      }
+      status = "connecting"
+      activity = null;
+      f.innerHTML += "<hr/>System Notice: Connection lost..."
     };
 
     onmessage = async function(event) {
