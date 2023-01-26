@@ -127,7 +127,7 @@ async def handle_interactions(user_id):
             gm_response = call_openai(prompt, 256)
             discussion += character[0] + ": " + message + '\n'
             discussion += "GM Response: " + gm_response + '\n'
-            prompt = generate_prompt("logic/check_players_decided", (players, discussion, ))
+            prompt = generate_prompt("logic/check_players_decided", (discussion, players, ))
             decided = call_openai(prompt, 32)
             if decided.lower().startswith("yes"):
                 # Check update for setting, location items, location details, and
