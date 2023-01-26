@@ -40,6 +40,7 @@ def call_openai(prompt, max_tokens = 256, model = "text-davinci-003"):
     return response
 
 def generate_image(prompt, size = "256x256"):
+    global token_use
     url = None
     while url is None:
         try:
