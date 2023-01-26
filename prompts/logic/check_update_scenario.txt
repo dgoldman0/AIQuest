@@ -1,4 +1,4 @@
-Determine whether the player's message and/or the GM response alter the scenario. Chances can include completion of a question or the start of a new quest, finding new important details, changes to travel companions and those involved with the scenario, etc.
+Determine whether the discussions between the players and the GM alter the scenario. Chances can include completion of a question or the start of a new quest, finding new important details, changes to travel companions and those involved with the scenario, etc.
 
 World Overview:
 {}
@@ -13,13 +13,13 @@ Location Items:
 Item ID | Item | Description | Location | Dimensions
 {}
 
-Player Clan: {}
-
 Current Scenario:
 {}
 
-Player's Character: {}
-Player's Message: {}
-GM Response: {}
+Player Characters:
+{}
 
-Based on the player's message and the GM's response, has the scenario changed (answer as yes or no)?
+Discussion:
+{}
+
+Based on the discussions between the players and the GM, has the scenario changed (answer as yes or no)?

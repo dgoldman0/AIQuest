@@ -1,4 +1,4 @@
-Determine whether the player's message and/or the GM response alter the general details in this location. General location details include things like buildings and other structures. 
+Determine whether the discussions between the players and the GM alter the general details in this location. General location details include things like buildings and other structures.
 
 World Overview:
 {}
@@ -13,13 +13,13 @@ Location Items:
 Item ID | Item | Description | Location | Dimensions
 {}
 
-Player Clan: {}
-
 Current Scenario:
 {}
 
-Player's Character: {}
-Player's Message: {}
-GM Response: {}
+Player Characters:
+{}
 
-Based on the player's message and the GM's response, have the location details changed (answer as yes or no)?
+Discussion:
+{}
+
+Based on the discussion between the players and the GM, have the location details changed (answer as yes or no)?

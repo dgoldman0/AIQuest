@@ -1,4 +1,10 @@
-Location Details:
+World Overview:
+{}
+
+Setting:
+{}
+
+General Location Details:
 {}
 
 Location Items:
@@ -8,14 +14,12 @@ Item ID | Item | Description | Location | Dimensions
 Current Scenario:
 {}
 
-Current Setting:
+Player Characters:
 {}
 
-Player's Character: {}
+Discussion:
+{}
 
-Message: {}
-Response: {}
-
-Update the location items based on the player message and GM response. Items can be altered, added, removed, etc.
+Update the location items based on the discussion between the players and the GM. Items can be altered, added, removed, etc.
 Updated Location Items || List of Changes (in order that they occur)
 Item ID | Item | Description | Location | Dimensions

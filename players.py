@@ -108,7 +108,7 @@ async def handle_interactions(user_id):
             first = False
             # Change to a summary that includes scenario, location, setting, etc.
             prompt = generate_prompt("interactions/summarize_current", (scenario, location[1], setting))
-            summary = call_openai(prompt, 512)
+            current = call_openai(prompt, 512)
             image_prompt = None
             while image_prompt is None:
                 prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
@@ -116,7 +116,7 @@ async def handle_interactions(user_id):
                 if len(summary) < 1000:
                     image_prompt = summary
             image_url = generate_image(image_prompt)
-            await websocket.send("NARRATION:![Current](" + image_url + ")" + summary.replace('\n', '\n\n'))
+            await websocket.send("NARRATION:![Current](" + image_url + ")" + current.replace('\n', '\n\n'))
             await websocket.send("WELCOME")
         message = await websocket.recv()
         if message.startswith("MSG:"):
@@ -127,12 +127,9 @@ async def handle_interactions(user_id):
             gm_response = call_openai(prompt, 256)
             discussion += character[0] + ": " + message + '\n'
             discussion += "GM Response: " + gm_response
-            prompt = generate_prompt("interactions/evaluate_discussion", (realm[1], location[1], location[2], scenario, setting, players, discussion, ))
-            gm_response = call_openai(prompt, 256)
-            if gm_response == "Ready." and False:
-                # setting, location details, items, clan, request
-                prompt = generate_prompt("interactions/evaluate_discussion", (realm[1], location[1], location[2], scenario, setting, players, discussion, ))
-                gm_response = call_openai(prompt, 256)
+            prompt = generate_prompt("logic/evaluate_still_coordinating", (players, discussion, ))
+            still_coordinating = call_openai(prompt, 32)
+            if still_coordinating.lower().startswith("no"):
                 # Check update for setting, location items, location details, and
                 # Check update might work well in Curie in which case I could save a few cents.
                 setting_progression = None
@@ -143,12 +140,11 @@ async def handle_interactions(user_id):
 
                 # Maybe combine setting revision and changes in one chunk so it can be coordinated in correct order
                 old_setting = setting
-                prompt = generate_prompt("logic/check_update_setting", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
+                prompt = generate_prompt("logic/check_update_setting", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, discussion, ))
                 response = call_openai(prompt, 32)
                 if response.lower().startswith("yes"):
                     changed = True
-                    # This is pushing out way too many changes.
-                    prompt = generate_prompt("storyline/update_setting", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
+                    prompt = generate_prompt("storyline/update_setting", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                     response = None
                     while response is None:
                         response = call_openai(prompt, 1024)
@@ -163,12 +159,12 @@ async def handle_interactions(user_id):
                     setting_progression = "None"
 
                 old_items = location[2]
-                prompt = generate_prompt("logic/check_update_items", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
+                prompt = generate_prompt("logic/check_update_items", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                 response = call_openai(prompt, 32)
                 if response.lower().startswith("yes"):
                     changed = True
                     # Should do a sanity check on items to make sure the dimensions make sense.
-                    prompt = generate_prompt("maps/update_location_items", (location[1], location[2], scenario, setting, character[0], message, gm_response, ))
+                    prompt = generate_prompt("maps/update_location_items", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                     response = None
                     while response is None:
                         response = call_openai(prompt, 1024)
@@ -184,11 +180,11 @@ async def handle_interactions(user_id):
                     items_progression = "None"
 
                 old_details = location[1]
-                prompt = generate_prompt("logic/check_update_details", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
+                prompt = generate_prompt("logic/check_update_details", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                 response = call_openai(prompt, 32)
                 if response.lower().startswith("yes"):
                     changed = True
-                    prompt = generate_prompt("maps/update_location_details", (location[1], location[2], scenario, setting, character[0], message, gm_response, ))
+                    prompt = generate_prompt("maps/update_location_details", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                     response = None
                     while response is None:
                         response = call_openai(prompt, 1024)
@@ -203,11 +199,11 @@ async def handle_interactions(user_id):
                     details_progression = "None"
 
                 old_scenario = scenario
-                prompt = generate_prompt("logic/check_update_scenario", (realm[1], setting, location[1], location[2], clan[0], scenario, character[0], message, gm_response, ))
+                prompt = generate_prompt("logic/check_update_scenario", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                 response = call_openai(prompt, 32)
                 if response.lower().startswith("yes"):
                     changed = True
-                    prompt = generate_prompt("storyline/update_scenario", (realm[1], location[1], location[2], scenario, setting, character[0], message, gm_response, ))
+                    prompt = generate_prompt("storyline/update_scenario", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                     response = None
                     while response is None:
                         response = call_openai(prompt, 1024)

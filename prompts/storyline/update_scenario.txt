@@ -3,6 +3,9 @@ The scenario includes main elements of the current story arc, including the curr
 World Overview:
 {}
 
+Current Setting:
+{}
+
 Location Details:
 {}
 
@@ -12,12 +15,11 @@ Location Items:
 Current Scenario:
 {}
 
-Current Setting:
+Player Characters:
 {}
 
-Player's Character: {}
-Message: {}
-Response: {}
+Discussion:
+{}
 
-Update scenario based on the player message and GM response:
+Update scenario based on the discussion between players and the GM:
 Updated Scenario (do not progress the story past what is explained in the response) || List of Changes (in order that they occur)

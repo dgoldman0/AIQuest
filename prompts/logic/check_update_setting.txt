@@ -1,4 +1,4 @@
-Determine whether the player's message and/or the GM response alter the setting. For instance, has the player moved to a new building, street, part of the general location, etc., has the time of day progressed, has the weather changed, and so on? Changes to the setting can include minor details.
+Determine whether the series of events discussed by the players and GM alter the setting. For instance, have the players moved to a new building, street, part of the general location, etc., has the time of day progressed, has the weather changed, and so on? Changes to the setting can include minor details.
 
 World Overview:
 {}
@@ -13,13 +13,13 @@ Location Items:
 Item ID | Item | Description | Location | Dimensions
 {}
 
-Player Clan: {}
-
 Current Scenario:
 {}
 
-Player's Character: {}
-Player's Message: {}
-GM Response: {}
+Player Characters:
+{}
 
-Based on the player's message and the GM's response, has the setting changed (answer as yes or no)?
+Discussion:
+{}
+
+Based on the discussion between the players and the GM, has the setting changed (answer as yes or no)?
