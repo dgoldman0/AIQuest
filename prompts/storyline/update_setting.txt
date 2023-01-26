@@ -22,4 +22,4 @@ Discussion:
 {}
 
 Update setting based on the discussion between players and the GM (allow the player to make decisions about their own actions):
-Updated Setting (three or four paragraphs) || List of Changes (in order that they occur)
+Updated Setting (verbose) || List of Changes (in order that they occur)

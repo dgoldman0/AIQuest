@@ -230,8 +230,11 @@ async def handle_interactions(user_id):
                     image_url = generate_image(image_prompt)
                     await websocket.send("NARRATION:![Developments](" + image_url + ")" + developments.replace('\n', '\n\n'))
                 else:
-                    prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
-                    image_prompt = call_openai(prompt, 245)
+                    while image_prompt is None:
+                        prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
+                        summary = call_openai(prompt, 245)
+                        if len(summary) < 1000:
+                            image_prompt = summary
                     image_url = generate_image(image_prompt)
                     await websocket.send("NARRATION:![GM Response](" + image_url + ")" + gm_response.replace('\n', '\n\n'))
             else:
