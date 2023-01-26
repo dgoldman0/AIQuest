@@ -114,7 +114,7 @@ $(document).ready(function() {
               f.innerHTML += "<hr/>You may now interact with the world..."
               status = "active"
             } else if (msg.startsWith("NARRATION:")) {
-              print_narration(f, msg.slice(10))
+              print_narration(msg.slice(10))
             } else if (msg.startsWith("STATUS:")){
               print_notice(f, htmlEncode(msg.slice(7)))
             }

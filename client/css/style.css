@@ -1,4 +1,12 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@font-face {
+	font-family: "Awery";
+	src: url("../fonts/Awery.ttf") format("truetype")
+}
+
+@font-face {
+	font-family: "Garton";
+	src: url("../fonts/garto16.ttf") format("truetype")
+}
 
 :root {
 	--dark-color-a: #000000;
@@ -15,8 +23,7 @@
 }
 
 body {
-	font-family: 'Roboto', sans-serif;
-	font-size: 16px;
+	font-size: 18px;
 	background: var(--light-color);
 	margin: 20px;
 }
@@ -122,7 +129,6 @@ a {
 
 .chat-messages .message .meta {
 	font-size: 15px;
-	font-weight: bold;
 	color: var(--dark-color-b);
 	opacity: 0.7;
 	margin-bottom: 7px;
@@ -290,13 +296,13 @@ i.fas.fa-paper-plane{
 	float: right;
 }
 
-@font-face {
-	font-family: "Awery";
-	src: local("Awery"),
-		url("../fonts/Awery.ttf")
+.player-block {
+	font-family: 'Garton', Arial, sans-serif;
 }
-.narration-block p: {
+
+.narration-block {
+	margin-top: 1px;
 	font-family: 'Awery', Arial, sans-serif;
 }
 
-.narration-block p:first-letter { font-size: 2em; }
+.narration-block p:first-letter { font-size: 1.1em; }
