@@ -1,0 +1,23 @@
+Respond to the player's message.
+
+World Overview:
+{}
+
+Location Details:
+{}
+
+Location Items:
+Item ID | Item | Description | Location | Dimensions
+{}
+
+Current Scenario: {}
+
+Setting:
+{}
+
+Player Characters:
+{}
+
+Discussion:
+
+Evaluate the discussion between the players and the GM and determine the series of events and determine the series of events that follows.

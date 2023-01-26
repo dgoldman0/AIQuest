@@ -1,3 +1,5 @@
+The scenario includes main elements of the current story arc, including the current motivations for the players.
+
 World Overview:
 {}
 

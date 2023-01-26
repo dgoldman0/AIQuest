@@ -4,4 +4,6 @@ World Overview:
 History:
 {}
 
-Create a current location that is {} by {}.
+Create a location that is {} by {}. It can be a single complete location or part of a larger location that spans a larger area.
+
+Location (be detailed):

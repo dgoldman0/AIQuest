@@ -1,3 +1,5 @@
+The setting contains elements about the current time of day, how things look the weather, the mood, and other similar details.
+
 World Overview:
 {}
 

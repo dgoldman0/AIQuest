@@ -290,4 +290,13 @@ i.fas.fa-paper-plane{
 	float: right;
 }
 
-p:first-letter { font-size: 3em; }
+@@font-face {
+	font-family: "Awery";
+	src: local("Awery"),
+		url("fonts/Awery.ttf")
+}
+.narration-block p: {
+	font-family: 'Awery', Arial, sans-serif;
+}
+
+.narration-block p:first-letter { font-size: 2em; }

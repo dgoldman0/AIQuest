@@ -1,0 +1,27 @@
+World Overview:
+{}
+
+Location Details:
+{}
+
+Location Items:
+Item ID | Item | Description | Location | Dimensions
+{}
+
+Current Scenario: {}
+
+Setting:
+{}
+
+Player Characters:
+{}
+
+A new message has been received by {}.
+Message: {}
+
+Give a new GM response based on the new message and the existing discussion. If the players have made their decisions for the around, respond with "Ready."
+
+Existing discussion between the players and the GM for the current round:
+{}
+
+GM Response:
