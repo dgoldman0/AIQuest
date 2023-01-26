@@ -127,9 +127,9 @@ async def handle_interactions(user_id):
             gm_response = call_openai(prompt, 256)
             discussion += character[0] + ": " + message + '\n'
             discussion += "GM Response: " + gm_response + '\n'
-            prompt = generate_prompt("logic/evaluate_still_coordinating", (players, discussion, ))
-            still_coordinating = call_openai(prompt, 32)
-            if still_coordinating.lower().startswith("no"):
+            prompt = generate_prompt("logic/check_players_decided", (players, discussion, ))
+            decided = call_openai(prompt, 32)
+            if decided.lower().startswith("yes"):
                 # Check update for setting, location items, location details, and
                 # Check update might work well in Curie in which case I could save a few cents.
                 setting_progression = None

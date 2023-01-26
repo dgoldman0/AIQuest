@@ -1,9 +1,9 @@
 The following is a discussion between the player characters and the DM. They are asking questions and discussing what to do next.
 
-Player Characters:
-{}
-
 Discussion:
 {}
 
-Are the players still asking questions and coordinating what to do next?
+Player Character List:
+{}
+
+Have all players in the player character list chosen an action (yes or no)?
