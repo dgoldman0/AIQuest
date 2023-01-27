@@ -37,15 +37,13 @@ def generate_character(level, clan_id, realm_id, x, y, user_id = None):
     realm = data.get_realm(realm_id)
     clan = data.get_clan(clan_id)
     cnt = 0
-    while cnt != 4:
-        prompt = generate_prompt("characters/generate_character", (realm[1], clan[0], clan[2], clan[3], level, ))
+    while cnt != 3:
+        prompt = generate_prompt("characters/generate_character", (realm[1], clan[0], clan[1], clan[3], level, ))
         list = call_openai(prompt, 1024)
         parameters = [parameter.strip() for parameter in list.split('|')]
         cnt = len(parameters)
-        if cnt != 4:
+        if cnt != 3:
             print("Incorrect arg count. Trying again...")
-    print("Character: " + parameters)
-    prompt = generate_prompt("characters/generate_features", (clan[0], clan[2], features, parameters[0], parameters[1], ))
+    prompt = generate_prompt("characters/generate_features", (clan[0], clan[1], clan[2], parameters[0], parameters[1], ))
     features = call_openai(prompt, 1024)
-    print("Character Features: " + features)
     return data.add_character(clan_id, parameters[0], parameters[1], features, parameters[2], realm_id, x, y, user_id)

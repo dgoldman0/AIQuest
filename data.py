@@ -176,7 +176,7 @@ def get_clan(clan_id, full = False):
     if full:
         res = cur.execute("SELECT name, short_description, long_description, physical_features, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     else:
-        res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
+        res = cur.execute("SELECT name, long_description, physical_features, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     return res.fetchone()
 
 def get_clan_features(clan_id):

@@ -20,6 +20,16 @@ def set_websocket(user_id, websocket):
     global websockets
     websockets[user_id] = websocket
 
+def img_realm(description, history):
+    # Generate image of realm
+    while image_prompt is None:
+        prompt = generate_prompt("interactions/images/realm", (description, history))
+        summary = call_openai(prompt, 245)
+        if len(summary) < 1000:
+            image_prompt = summary
+    image_url = generate_image(image_prompt)
+
+
 # Welcome new player.
 async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     # Currently uses global which is bad because it's not unique for each user.
@@ -28,15 +38,18 @@ async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     user_states[user_id] = state
 
     websocket = websockets[user_id]
-    realm = data.get_realm(realm_id)
     prompt = generate_prompt("interactions/introduce_realm", (realm[0], realm[1], realm[2], ))
     introduction = call_openai(prompt, 512)
     await websocket.send("NARRATION:" + introduction.replace('\n', '\n\n'))
+#    image_url = img_realm()
+#    await websocket.send("NARRATION:![Current](" + image_url + ")" + introduction.replace('\n', '\n\n'))
     character = data.get_character(character_id, True)
+    realm = data.get_realm(character[5])
     clan = data.get_clan(clan_id, True)
     prompt = generate_prompt("interactions/introduce_player_character", (character[0], character[2], clan[0], clan[2], ))
     introduction = call_openai(prompt, 512)
     await websocket.send("NARRATION:" + introduction.replace('\n', '\n\n'))
+#    await websocket.send("NARRATION:![Current](" + image_url + ")" + introduction.replace('\n', '\n\n'))
     location = data.get_map(realm_id, x, y)
     if location is None:
         # Generate new location.
@@ -47,6 +60,9 @@ async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     state['realm'] = list(realm)
     state['clan'] = list(clan)
     state['location'] = list(location)
+    state['realm_id'] = realm_id
+    state['x'] = x
+    state['y'] = y
     # Check if scenario already exists. If not, create one.
     await handle_interactions(user_id)
 
@@ -58,10 +74,10 @@ async def load(user_id):
     websocket = websockets[user_id]
     # Load settings from previous state.
     character = data.get_user_character(user_id, True)
-    realm_id = character[4]
+    realm_id = character[5]
     clan_id = character[1]
-    x = character[5]
-    y = character[6]
+    x = character[6]
+    y = character[7]
     location = data.get_map(realm_id, x, y)
 
     realm = data.get_realm(realm_id)

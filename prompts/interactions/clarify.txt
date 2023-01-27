@@ -6,4 +6,4 @@ Discussion:
 Player Character List:
 {}
 
-Have all players in the player character list chosen an action (yes, no, or unsure)?
+Ask for clarification on whether everyone has decided what to do next.

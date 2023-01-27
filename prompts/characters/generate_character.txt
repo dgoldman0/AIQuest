@@ -3,10 +3,10 @@ Generate a character using the following information.
 Setting:
 {}
 
-Clan information (Clan Name | Description | Elemental Affinities):
+Clan Name | Clan Description | Elemental Affinities
 {} | {} | {}
 
 Character level (novice, initiate, adept, expert, master, legendary): {}
 
-Use the following format: Character Name | Background (Detailed) | Starting Elemental Affinities
-Character:
+Use the following format:
+Character Name | Background (Detailed) | Starting Elemental Affinities
