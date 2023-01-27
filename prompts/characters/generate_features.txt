@@ -9,4 +9,4 @@ Clan Physical Features: {}
 Character Name: {}
 Background: {}
 
-Physical Description:
+Physical Description (detailed):

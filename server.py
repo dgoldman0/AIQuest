@@ -81,8 +81,8 @@ async def handle_player(websocket, path = None):
                 user_id = data.add_user(username, password, salt)
 
                 # Place user randomly into the realm.
-                x = randint(0, 20000000)
-                y = randint(0, 20000000)
+                x = randint(0, 200)
+                y = randint(0, 200)
                 character_id = characters.generate_character('novice', clan_id, realm_id, x, y, user_id)
                 players.set_websocket(user_id, websocket)
                 await websocket.send("SUCCESS")

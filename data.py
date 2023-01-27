@@ -166,7 +166,7 @@ def add_clans(realm_id, clans):
     cur = database.cursor()
     # It's okay to inject realm_id because it has to be an integer.
     realm_id = str(int(realm_id))
-    cur.executemany("INSERT INTO CLANS (realm_id, name, short_description, long_description, affinities) VALUES (" + realm_id + ", ?, ?, ?, ?);", clans)
+    cur.executemany("INSERT INTO CLANS (realm_id, name, short_description, long_description, physical_features, affinities) VALUES (" + realm_id + ", ?, ?, ?, ?, ?);", clans)
     database.commit()
 
 def get_clan(clan_id, full = False):

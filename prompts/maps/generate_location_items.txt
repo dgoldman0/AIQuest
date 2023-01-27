@@ -1,9 +1,0 @@
-World Overview:
-{}
-
-Place {} items in a {} by {} area. Include their location in (x, y) coordinates.
-
-Use the following location details:
-{}
-
-Use the following format: Item ID | Item | Description | Location | Dimensions (m). Be very detailed.

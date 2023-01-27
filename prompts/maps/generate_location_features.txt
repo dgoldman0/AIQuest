@@ -1,0 +1,11 @@
+Features in a location can include buildings and other large scale structures, natural phenomena such as rivers and hills, and other permanent and semi-permanent elements.
+
+World Overview:
+{}
+
+Place {} features in a {} by {} area. Include their location in (x, y) coordinates.
+
+Location details:
+{}
+
+Use the following format: Feature ID | Feature | Description | Location | Dimensions (m). Be very detailed.
