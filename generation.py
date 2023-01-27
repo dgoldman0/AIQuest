@@ -7,10 +7,12 @@ token_use = 0
 def wrapper(func, args):
     return func(*args)
 
-def generate_prompt(job, parameters):
+def generate_prompt(job, parameters = None):
     file = open("prompts/" + job + ".txt",mode='r')
     template = file.read()
     file.close()
+    if parameters is None:
+        return template
     return wrapper(template.format, parameters)
 
 # So far all calls to openai should work with the same parameters so why repeat code?

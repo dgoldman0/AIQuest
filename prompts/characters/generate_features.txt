@@ -1,0 +1,12 @@
+Generate a physical description of the following character.
+
+Clan Name: {}
+
+Clan Description: {}
+
+Clan Physical Features: {}
+
+Character Name: {}
+Background: {}
+
+Physical Description:

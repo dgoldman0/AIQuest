@@ -52,7 +52,7 @@ def init():
             # Create initial realm.
             realms.create_realm()
             # Initialize novice spells.
-            magic.initialize_spells()
+#            magic.initialize_spells()
 
 # User Data
 def get_user(user_id):

@@ -1,0 +1,7 @@
+Generate a physical description of the following clan.
+
+Clan Name: {}
+
+Clan Description: {}
+
+Physical Description:
