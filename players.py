@@ -159,12 +159,12 @@ async def handle_interactions(user_id):
                     setting_progression = "None"
 
                 old_items = location[2]
-                prompt = generate_prompt("logic/check_update_items", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
+                prompt = generate_prompt("logic/check_update_location_features", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                 response = call_openai(prompt, 32)
                 if response.lower().startswith("yes"):
                     changed = True
                     # Should do a sanity check on items to make sure the dimensions make sense.
-                    prompt = generate_prompt("maps/update_location_items", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
+                    prompt = generate_prompt("maps/update_location_features", (realm[1], setting, location[1], location[2], scenario, players, discussion, ))
                     response = None
                     while response is None:
                         response = call_openai(prompt, 1024)

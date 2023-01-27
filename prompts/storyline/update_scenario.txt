@@ -9,7 +9,8 @@ Current Setting:
 Location Details:
 {}
 
-Location Items:
+Location Features:
+Feature ID | Feature | Description | Location | Dimensions
 {}
 
 Current Scenario:

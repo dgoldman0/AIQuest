@@ -7,7 +7,7 @@ History:
 Location Details:
 {}
 
-Location Items:
+Location Features:
 {}
 
 Character Information:

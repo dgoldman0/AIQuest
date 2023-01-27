@@ -9,7 +9,7 @@ Current Setting:
 Location Details:
 {}
 
-Location Items:
+Location Features:
 {}
 
 Current Scenario:

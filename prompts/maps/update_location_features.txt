@@ -1,0 +1,27 @@
+Features in a location can include buildings and other large scale structures, natural phenomena such as rivers and hills, and other permanent and semi-permanent elements.
+
+World Overview:
+{}
+
+Setting:
+{}
+
+General Location Details:
+{}
+
+Location Features:
+Feature ID | Feature | Description | Location | Dimensions
+{}
+
+Current Scenario:
+{}
+
+Player Characters:
+{}
+
+Discussion:
+{}
+
+Update the location features based on the discussion between the players and the GM. Features can be altered, added, removed, etc.
+Updated Location Features || List of Changes (in order that they occur)
+Feature ID | Feature | Description | Location | Dimensions

@@ -4,8 +4,8 @@ World Overview:
 Location Details:
 {}
 
-Location Items:
-Item ID | Item | Description | Location | Dimensions
+Location Features:
+Feature ID | Feature | Description | Location | Dimensions
 {}
 
 Current Scenario: {}
@@ -24,4 +24,4 @@ Message: {}
 Existing discussion between the players and the GM for the current round:
 {}
 
-Additional needed information (options are player spells, player abilities): 
+Additional needed information (options are player spells, player abilities):

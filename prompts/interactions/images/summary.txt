@@ -4,8 +4,8 @@ Setting:
 Location Details:
 {}
 
-Location Items:
-Item ID | Item | Description | Location | Dimensions
+Location Features:
+Feature ID | Feature | Description | Location | Dimensions
 {}
 
 Describe what is seen.

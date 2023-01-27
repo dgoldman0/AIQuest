@@ -7,7 +7,7 @@ Scenario Developments:
 Location Details Developments:
 {}
 
-Location Items Developments:
+Location Feature Developments:
 {}
 
 Setting Developments:
