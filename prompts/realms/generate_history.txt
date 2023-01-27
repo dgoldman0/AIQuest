@@ -2,4 +2,4 @@ Realm Name: {}
 Setting: {}
 
 Write a long detailed history for this realm.
-History:
+History (detailed):

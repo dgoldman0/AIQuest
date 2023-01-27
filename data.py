@@ -36,12 +36,12 @@ def init():
             password = bcrypt.hashpw(password1.encode(), salt)
             cur.execute("INSERT INTO USERS (username, passwd, salt, admin) VALUES (?, ?, ?, ?);", (username, password, salt, True))
             cur.execute("CREATE TABLE CHARACTERS (user_id INT, name TEXT NOT NULL);")
-            cur.execute("CREATE TABLE CHARACTER_DETAILS (character_id INT NOT NULL, clan_id INT NOT NULL, background TEXT NOT NULL, affinities TEXT NOT NULL);")
+            cur.execute("CREATE TABLE CHARACTER_DETAILS (character_id INT NOT NULL, clan_id INT NOT NULL, background TEXT NOT NULL, physical_features TEXT NOT NULL, affinities TEXT NOT NULL);")
             cur.execute("CREATE TABLE CHARACTER_LOCATION (character_id INT NOT NULL, realm_id INT NOT NULL, x INT NOT NULL, y INT NOT NULL);")
             # Basic World Settings Table
             cur.execute("CREATE TABLE REALMS (name TEXT NOT NULL, setting TEXT NOT NULL, history TEXT NOT NULL);")
             # Clan List Table
-            cur.execute("CREATE TABLE CLANS (realm_id INT NOT NULL, name TEXT NOT NULL, short_description TEXT NOT NULL, long_description TEXT NOT NULL, affinities TEXT NOT NULL);")
+            cur.execute("CREATE TABLE CLANS (realm_id INT NOT NULL, name TEXT NOT NULL, short_description TEXT NOT NULL, long_description TEXT NOT NULL, physical_features TEXT NOT NULL, affinities TEXT NOT NULL);")
             # Create spell tables.
             cur.execute("CREATE TABLE SPELLS (name TEXT NOT NULL, elements TEXT NOT NULL, tier TEXT NOT NULL, cost INT NOT NULL, description TEXT NOT NULL, mishaps TEXT);")
             # Create map tables.
@@ -174,16 +174,22 @@ def get_clan(clan_id, full = False):
     cur = database.cursor()
     print(clan_id)
     if full:
-        res = cur.execute("SELECT name, short_description, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
+        res = cur.execute("SELECT name, short_description, long_description, physical_features, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
     else:
         res = cur.execute("SELECT name, long_description, affinities FROM CLANS WHERE rowid = ?;", (clan_id, ))
+    return res.fetchone()
+
+def get_clan_features(clan_id):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT physical_features FROM CLANS WHERE rowid = ?;", (clan_id, ))
     return res.fetchone()
 
 def get_user_character(user_id, full = False):
     global database
     cur = database.cursor()
     if full:
-        sql = """SELECT c.name, cd.clan_id, cd.background, cd.affinities, cl.realm_id, cl.x, cl.y
+        sql = """SELECT c.name, cd.clan_id, cd.background, cd.physical_features, cd.affinities, cl.realm_id, cl.x, cl.y
         FROM characters c
         JOIN character_details cd
         ON c.rowid = cd.character_id
@@ -199,7 +205,7 @@ def get_character(character_id, full = False):
     global database
     cur = database.cursor()
     if full:
-        sql = """SELECT c.name, cd.clan_id, cd.background, cd.affinities, cl.realm_id, cl.x, cl.y
+        sql = """SELECT c.name, cd.clan_id, cd.background, cd.physical_features, cd.affinities, cl.realm_id, cl.x, cl.y
         FROM characters c
         JOIN character_details cd
         ON c.rowid = cd.character_id
@@ -212,12 +218,12 @@ def get_character(character_id, full = False):
         res = cur.execute("SELECT user_id, name FROM CHARACTERS WHERE rowid = ?;", (character_id, ))
     return res.fetchone()
 
-def add_character(clan_id, name, background, affinities, realm_id, x, y, user_id):
+def add_character(clan_id, name, background, physical_features, affinities, realm_id, x, y, user_id):
     global database
     cur = database.cursor()
     cur.execute("INSERT INTO CHARACTERS (user_id, name) VALUES (?, ?);", (user_id, name))
     character_id = cur.lastrowid
-    cur.execute("INSERT INTO CHARACTER_DETAILS (character_id, clan_id, background, affinities) VALUES (?, ?, ?, ?)", (character_id, clan_id, background, affinities, ))
+    cur.execute("INSERT INTO CHARACTER_DETAILS (character_id, clan_id, background, physical_features, affinities) VALUES (?, ?, ?, ?, ?)", (character_id, clan_id, background, physical_features, affinities, ))
     cur.execute("INSERT INTO CHARACTER_LOCATION (character_id, realm_id, x, y) VALUES (?, ?, ?, ?)", (character_id, realm_id, x, y, ))
     database.commit()
     return character_id
