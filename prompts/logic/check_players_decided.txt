@@ -1,9 +1,14 @@
 The following is a discussion between the player characters and the DM. They are asking questions and discussing what to do this round.
 
+Setting:
+{}
+
+Round Duration: {}
+
 Discussion:
 {}
 
 Player Character List:
 {}
 
-Have all players in the player character list decided what to do this round (yes or no)?
+Are the players still coordinating their activities for the round (yes, no, unsure)?

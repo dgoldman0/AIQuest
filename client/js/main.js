@@ -179,7 +179,7 @@ $(document).ready(function() {
           }
         } else {
           status = "waiting"
-          print_player(htmlEncode(msg))
+          print_player(f, htmlEncode(msg))
           f.scrollTop = f.scrollHeight
           await ws.send("MSG:" + msg);
         }

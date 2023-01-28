@@ -297,11 +297,13 @@ i.fas.fa-paper-plane{
 }
 
 .player-block {
+	margin-top: 2px;
 	font-family: 'Garton', Arial, sans-serif;
+	font-size: 1.2em
 }
 
 .narration-block {
-	margin-top: 1px;
+	margin-top: 2px;
 	font-family: 'Awery', Arial, sans-serif;
 }
 
