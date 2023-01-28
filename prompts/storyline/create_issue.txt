@@ -17,5 +17,4 @@ Scenario:
 Setting:
 {}
 
-Create an issue that needs to be resolved, based on the current scenario and setting.
-Issue:
+What is the next issue that must be faced (The issue should include only one step)?

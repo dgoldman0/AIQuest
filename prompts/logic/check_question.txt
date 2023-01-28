@@ -1,0 +1,3 @@
+Message: {}
+
+Is the message a question (yes or no)?

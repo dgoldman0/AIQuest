@@ -7,4 +7,6 @@ Location Details:
 Setting:
 {}
 
-Summarize the current scenario, location, and settings, in narrative form (two to three paragraphs):
+Current Issue: {}
+
+Summarize the current scenario, location, and settings, in narrative form and end with a summary of the current issue:

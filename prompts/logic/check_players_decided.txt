@@ -1,14 +1,12 @@
-The following is a discussion between the player characters and the DM. They are asking questions and discussing what to do this round.
-
-Setting:
-{}
-
 Current Issue: {}
-
-Discussion:
-{}
 
 Player Character List:
 {}
 
-Have the players coordinated enough activity move forward with handling the current issue (yes, no, unsure)?
+The players are prepared when each player in the Player Character List has voiced their desired course of action and each has finished asking questions. If anyone from the Player Character List is still asking questions, then the players are not prepared. If the players are still discussing their plan with each other, then the players are not prepared. If the most recent comment in the discussion is a question, then the players are not prepared.
+
+Discussion:
+{}
+End of Discussion
+
+Are all players in the Player Character List prepared (yes, no, unsure)?

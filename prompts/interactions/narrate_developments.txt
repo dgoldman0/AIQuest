@@ -13,4 +13,8 @@ Location Feature Developments:
 Setting Developments:
 {}
 
+Old Issue: {}
+
+Current Issue: {}
+
 Narrate developments (detailed):
