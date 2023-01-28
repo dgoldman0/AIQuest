@@ -126,8 +126,8 @@ async def handle_interactions(user_id):
             prompt = generate_prompt("interactions/summarize_current", (scenario, location[1], setting))
             current = call_openai(prompt, 512)
             image_prompt = None
+            prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
             while image_prompt is None:
-                prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
                 summary = call_openai(prompt, 245)
                 if len(summary) < 1000:
                     image_prompt = summary
@@ -139,13 +139,13 @@ async def handle_interactions(user_id):
             message = message[4:]
             # For now it's just the one character, but that'll change over time.
             players = character[0]
-            prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, discussion, ))
-            gm_response = call_openai(prompt, 256)
             discussion += character[0] + ": " + message + '\n'
-            discussion += "GM Response: " + gm_response + '\n'
             prompt = generate_prompt("logic/check_players_decided", (discussion, players, ))
             decided = call_openai(prompt, 32)
+            # Add the response so the GM response doesn't accidentally trigger a "yes" answer.
             if decided.lower().startswith("yes"):
+                prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, discussion, ))
+                gm_response = call_openai(prompt, 256)
                 # Check update for setting, location items, location details, and
                 # Check update might work well in Curie in which case I could save a few cents.
                 setting_progression = None
@@ -156,7 +156,8 @@ async def handle_interactions(user_id):
 
                 # Maybe combine setting revision and changes in one chunk so it can be coordinated in correct order
                 old_setting = setting
-                prompt = generate_prompt("logic/check_update_setting", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, discussion, ))
+                # Currently rounds will just be fixed one minute length, out of high intensity situations a round can be a lot longer. For instance, traveling, sleeping, etc.
+                prompt = generate_prompt("logic/check_update_setting", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, "1 minute", discussion, ))
                 response = call_openai(prompt, 32)
                 if response.lower().startswith("yes"):
                     changed = True
@@ -246,15 +247,24 @@ async def handle_interactions(user_id):
                     image_url = generate_image(image_prompt)
                     await websocket.send("NARRATION:![Developments](" + image_url + ")" + developments.replace('\n', '\n\n'))
                 else:
+                    prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
+                    image_prompt = None
                     while image_prompt is None:
-                        prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
                         summary = call_openai(prompt, 245)
                         if len(summary) < 1000:
                             image_prompt = summary
                     image_url = generate_image(image_prompt)
                     await websocket.send("NARRATION:![GM Response](" + image_url + ")" + gm_response.replace('\n', '\n\n'))
+                    return
+#            elif decided.lower().startswith("unsure"):
+#                prompt = generate_prompt("interactions/request_clarification", (discussion, players, ))
+#                gm_response = call_openai(prompt, 256)
             else:
-                await websocket.send("NARRATION:" + gm_response)
+                prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, discussion, ))
+                gm_response = call_openai(prompt, 256)
+
+            discussion += "GM Response: " + gm_response + '\n'
+            await websocket.send("NARRATION:" + gm_response)
         else:
             pass
         await websocket.send("FINISHED") # Indicates finished with current narration.

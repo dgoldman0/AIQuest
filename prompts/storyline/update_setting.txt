@@ -1,25 +1,18 @@
 The setting contains elements about the current time of day, how things look the weather, the mood, and other similar details.
 
-World Overview:
-{}
+World Overview: {}
 
-Current Setting:
-{}
+Current Setting: {}
 
-Location Details:
-{}
+Location Details: {}
 
-Location Features:
-{}
+Location Features: {}
 
-Current Scenario:
-{}
+Current Scenario: {}
 
-Player Characters:
-{}
+Player Characters: {}
 
-Discussion:
-{}
+Discussion: {}
 
-Update setting based on the discussion between players and the GM (allow the player to make decisions about their own actions):
-Updated Setting (verbose) || List of Changes (in order that they occur)
+Update the setting based on the discussion between players and the GM:
+Updated Setting (verbose, keep track of time of day, location, and other details) || List of Changes (in order that they occur)
