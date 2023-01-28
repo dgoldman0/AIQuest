@@ -285,10 +285,6 @@ i.fas.fa-paper-plane{
     color: #009879;
 }
 
-.narration-block {
-	overflow: hidden
-}
-
 .narration-block img {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 	padding: 5px;
@@ -297,12 +293,13 @@ i.fas.fa-paper-plane{
 }
 
 .player-block {
-	margin-top: 2px;
+	margin-top: 4px;
 	font-family: 'Garton', Arial, sans-serif;
-	font-size: 1.2em
+	font-size: 1.3em
 }
 
 .narration-block {
+	overflow: hidden
 	margin-top: 2px;
 	font-family: 'Awery', Arial, sans-serif;
 }
