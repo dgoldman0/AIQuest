@@ -143,9 +143,9 @@ async def handle_interactions(user_id):
             players = character[0]
             discussion += character[0] + ": " + message + '\n'
             prompt = generate_prompt("logic/check_players_decided", (setting, round_duration, discussion, players, ))
-            deciding = call_openai(prompt, 32)
+            decided = call_openai(prompt, 32)
             # Add the response so the GM response doesn't accidentally trigger a "yes" answer.
-            if deciding.lower().startswith("no"):
+            if decided.lower().startswith("yes"):
                 prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, round_duration, discussion, ))
                 gm_response = call_openai(prompt, 256)
                 # Check update for setting, location items, location details, and
@@ -258,7 +258,7 @@ async def handle_interactions(user_id):
                     image_url = generate_image(image_prompt)
                     await websocket.send("NARRATION:![GM Response](" + image_url + ")" + gm_response.replace('\n', '\n\n'))
                     return
-            elif deciding.lower().startswith("unsure"):
+            elif decided.lower().startswith("unsure"):
                 prompt = generate_prompt("interactions/request_clarification", (discussion, players, ))
                 gm_response = call_openai(prompt, 256)
             else:

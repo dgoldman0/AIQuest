@@ -11,4 +11,4 @@ Discussion:
 Player Character List:
 {}
 
-Are the players still coordinating their activities for the round (yes, no, unsure)?
+Have the players coordinated enough activity to move the round forward (yes, no, unsure)?
