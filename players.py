@@ -105,6 +105,7 @@ async def handle_interactions(user_id):
         realm_id = state['realm_id']
         x = state['x']
         y = state['y']
+        current_issue = state['current_issue']
         scenario = data.get_scenario()
         setting = data.get_current_setting(user_id)
         story = data.get_story(user_id)
@@ -120,6 +121,10 @@ async def handle_interactions(user_id):
         if story is None:
             story = scenario
             data.update_story(user_id, story)
+        if current_issue is None:
+            prompt = generate_prompt("storyline/create_issue", realm[1], realm[2], location[1], location[2], scenario, setting, )
+            current_issue = call_openai(prompt, 64)
+            state['current_issue'] = current_issue
         if first:
             first = False
             # Change to a summary that includes scenario, location, setting, etc.
@@ -135,18 +140,17 @@ async def handle_interactions(user_id):
             await websocket.send("NARRATION:![Current](" + image_url + ")" + current.replace('\n', '\n\n'))
             await websocket.send("WELCOME")
         message = await websocket.recv()
-        # Currently rounds will just be fixed one minute length, out of high intensity situations a round can be a lot longer. For instance, traveling, sleeping, etc.
-        round_duration = "1 minute"
+        # Replace round_duration with "current issue." Then ask something like "have the players addressed the current issue?"
         if message.startswith("MSG:"):
             message = message[4:]
             # For now it's just the one character, but that'll change over time.
             players = character[0]
             discussion += character[0] + ": " + message + '\n'
-            prompt = generate_prompt("logic/check_players_decided", (setting, round_duration, discussion, players, ))
+            prompt = generate_prompt("logic/check_players_decided", (setting, current_issue, discussion, players, ))
             decided = call_openai(prompt, 32)
             # Add the response so the GM response doesn't accidentally trigger a "yes" answer.
             if decided.lower().startswith("yes"):
-                prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, round_duration, discussion, ))
+                prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, current_issue, discussion, ))
                 gm_response = call_openai(prompt, 256)
                 # Check update for setting, location items, location details, and
                 # Check update might work well in Curie in which case I could save a few cents.
@@ -236,12 +240,17 @@ async def handle_interactions(user_id):
                 else:
                     scenario_progression = "None"
 
-                old_story = story
-                prompt = generate_prompt("storyline/progress_story", (story, scenario_progression, details_progression, items_progression, setting_progression, ))
-                response = call_openai(prompt, 1024)
-                discussion = ""
-                data.update_story(user_id, response)
                 if changed:
+                    old_story = story
+                    prompt = generate_prompt("storyline/progress_story", (story, scenario_progression, details_progression, items_progression, setting_progression, ))
+                    response = call_openai(prompt, 1024)
+                    discussion = ""
+                    data.update_story(user_id, response)
+
+                    prompt = generate_prompt("storyline/create_issue", realm[1], realm[2], location[1], location[2], scenario, setting, )
+                    current_issue = call_openai(prompt, 64)
+                    state['current_issue'] = current_issue
+
                     prompt = generate_prompt("interactions/narrate_developments", (story, scenario_progression, details_progression, items_progression, setting_progression, ))
                     developments = call_openai(prompt, 800)
                     prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
@@ -262,7 +271,7 @@ async def handle_interactions(user_id):
                 prompt = generate_prompt("interactions/request_clarification", (discussion, players, ))
                 gm_response = call_openai(prompt, 256)
             else:
-                prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, round_duration, discussion, ))
+                prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, current_issue, discussion, ))
                 gm_response = call_openai(prompt, 256)
 
             discussion += "GM Response: " + gm_response + '\n'

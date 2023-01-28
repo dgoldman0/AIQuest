@@ -1,0 +1,21 @@
+Realm Overview:
+{}
+
+History:
+{}
+
+Location Details:
+{}
+
+Location Features:
+Feature ID | Feature | Description | Location | Dimensions
+{}
+
+Scenario:
+{}
+
+Setting:
+{}
+
+Create an issue that needs to be resolved, based on the current scenario and setting.
+Issue:

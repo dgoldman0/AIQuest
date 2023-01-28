@@ -21,7 +21,7 @@ Players are coordinating what to do this round. Give a new GM response based on 
 A new message has been received from {}.
 Message: {}
 
-Round Duration: {}
+Current Issue: {}
 
 Existing discussion between the players and the GM for the current round:
 {}

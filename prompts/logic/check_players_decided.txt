@@ -3,7 +3,7 @@ The following is a discussion between the player characters and the DM. They are
 Setting:
 {}
 
-Round Duration: {}
+Current Issue: {}
 
 Discussion:
 {}
@@ -11,4 +11,4 @@ Discussion:
 Player Character List:
 {}
 
-Have the players coordinated enough activity to move the round forward (yes, no, unsure)?
+Have the players coordinated enough activity move forward with handling the current issue (yes, no, unsure)?
