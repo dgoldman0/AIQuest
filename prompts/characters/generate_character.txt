@@ -6,7 +6,7 @@ Setting:
 Clan Name | Clan Description | Elemental Affinities
 {} | {} | {}
 
-Character level (novice, initiate, adept, expert, master, legendary): {}
+Character Level (novice, initiate, adept, expert, master, legendary): {}
 
 Use the following format:
 Character Name | Background (Detailed) | Starting Elemental Affinities

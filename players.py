@@ -146,6 +146,11 @@ async def handle_interactions(user_id):
             message = message[4:]
             # For now it's just the one character, but that'll change over time.
             players = character[0]
+            # Check if the message appears malicious.
+            prompt = generate_prompt("logic/check_malicious", (message, ))
+            malicious = call_openai(prompt, 32)
+            if malicious.lower().startswith("yes"):
+                await websocket.send("SYSTEM:MALICIOUS")
             discussion += character[0] + ": " + message + '\n'
             decided = ""
             prompt = generate_prompt("logic/check_question", (message, ))
@@ -284,16 +289,18 @@ async def handle_interactions(user_id):
                     image_url = generate_image(image_prompt)
                     await websocket.send("NARRATION:![GM Response](" + image_url + ")" + gm_response.replace('\n', '\n\n'))
                 discussion = ""
-                return
             elif decided.lower().startswith("unsure"):
                 prompt = generate_prompt("interactions/request_clarification", (discussion, players, ))
                 gm_response = call_openai(prompt, 256)
             else:
+                # Probably alter this part to check to see if more information is needed, such as information about items held by users, skills, etc.
                 prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, players, character[0], message, current_issue, discussion, ))
                 gm_response = call_openai(prompt, 256)
 
-            discussion += "GM Response: " + gm_response + '\n'
-            await websocket.send("NARRATION:" + gm_response)
+            # Check if discussion was cleared (in other words if the round has played out)
+            if discussion != "":
+                discussion += "GM Response: " + gm_response + '\n'
+                await websocket.send("NARRATION:" + gm_response)
         else:
             pass
         await websocket.send("FINISHED") # Indicates finished with current narration.

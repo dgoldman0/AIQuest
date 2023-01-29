@@ -1,3 +1,5 @@
+# Might replace magic w/ skills.
+
 from generation import generate_prompt
 from generation import call_openai
 

@@ -22,7 +22,7 @@ function print_narration(f, message) {
 }
 
 function print_notice(f, notice) {
-  f.innerHTML += `<hr/>System Notice: ${notice}"`
+  f.innerHTML += `<hr/>System Notice: ${notice}`
 }
 
 $(document).ready(function() {
@@ -45,78 +45,84 @@ $(document).ready(function() {
     onmessage = async function(event) {
           console.log(event)
           msg = await event.data;
-          // Change status system so that it differentiates between login and registration.
-          switch (status) {
-            case 'connecting':
-            if (msg == "AIQuest") {
-              print_notice(f, "Connected to AIQuest")
-            } else {
+          if (msg.startsWith("SYSTEM:")) {
+            if (msg == "SYSTEM:MALICIOUS") {
+              print_notice(f, "The system has detected that your message may be malicious...")
             }
-            break;
-            case 'salt':
-            if (msg.startsWith("CHALLENGE:$2b")) {
-              // The 2a replacement is due to salt version. See https://github.com/ircmaxell/password_compat/issues/49
-              salt = "$2y" + msg.substring(13);
-              hashed_pw = dcodeIO.bcrypt.hashSync(password, salt);
-              hashed_pw = "$2b" + hashed_pw.slice(3);
-              status = "verifying";
-              await ws.send(hashed_pw);
-            } else if (msg == "EXISTINGUSER") {
-              ws.close();
-            }
-            break;
-            case 'verifying':
-            if (activity == "login") {
-              if (msg == "SUCCESS") {
-                print_notice(f, "Authentication successful...")
-                status = "connected";
-              } else if (msg == "INVALID" || msg == "UNKNOWN") {
-                f.innerHTML += "<hr/>Unable to connect: Invalid login credentials."
-              } else if (msg == "BLOCKED") {
-                f.innerHTML += "<hr/>Unable to connect: User is blocked from accessing SAM."
+          } else {
+
+            switch (status) {
+              case 'connecting':
+              if (msg == "AIQuest") {
+                print_notice(f, "Connected to AIQuest")
+              } else {
               }
-            } else if (activity == "register") {
-              // Neither of these tables are disabled after selection. Need to really clean things up properly.
-              if (msg.startsWith("REALMS:")) {
-                f.innerHTML += "<br/>Select Starting Realm"
-                realms = JSON.parse(msg.substring(7))
-                html = "<br/><table id = 'realmselect' class = 'styled-table'><tr><th>Realm</th><th>Description</th></tr>"
-                for (realm of realms) {
-                  html += "<tr onclick = 'send_message(" + realm[0] + ");'><td>" + realm[1] + "</td><td>" + realm[2] + "</td></tr>"
-                }
-                f.innerHTML += html
-              } else if (msg.startsWith("CLANS:")) {
-                f.innerHTML += "<br/>Select Starting Clan"
-                clans = JSON.parse(msg.substring(6))
-                html = "<br/><table id = 'clanselection' class = 'styled-table'><tr><th>Clan</th><th>Description</th></tr>"
-                for (clan of clans) {
-                  html += "<tr onclick = 'send_message(" + clan[0] + ");'><td>" + clan[1] + "</td><td>" + clan[2] + "</td></tr>"
-                }
-                f.innerHTML += html
-              } else if (msg == "SUCCESS") {
-                status = "connected"
-                f.innerHTML += "<hr/>Registration Complete."
-                status = "synopsis";
+              break;
+              case 'salt':
+              if (msg.startsWith("CHALLENGE:$2b")) {
+                // The 2a replacement is due to salt version. See https://github.com/ircmaxell/password_compat/issues/49
+                salt = "$2y" + msg.substring(13);
+                hashed_pw = dcodeIO.bcrypt.hashSync(password, salt);
+                hashed_pw = "$2b" + hashed_pw.slice(3);
+                status = "verifying";
+                await ws.send(hashed_pw);
+              } else if (msg == "EXISTINGUSER") {
+                ws.close();
               }
-            }
-            break;
-            case 'waiting':
-            if (msg == "FINISHED") {
-              status = "active"
-            } else {
-              if (msg.startsWith("NARRATION:")) {
+              break;
+              case 'verifying':
+              if (activity == "login") {
+                if (msg == "SUCCESS") {
+                  print_notice(f, "Authentication successful...")
+                  status = "connected";
+                } else if (msg == "INVALID" || msg == "UNKNOWN") {
+                  f.innerHTML += "<hr/>Unable to connect: Invalid login credentials."
+                } else if (msg == "BLOCKED") {
+                  f.innerHTML += "<hr/>Unable to connect: User is blocked from accessing SAM."
+                }
+              } else if (activity == "register") {
+                // Neither of these tables are disabled after selection. Need to really clean things up properly.
+                if (msg.startsWith("REALMS:")) {
+                  f.innerHTML += "<br/>Select Starting Realm"
+                  realms = JSON.parse(msg.substring(7))
+                  html = "<br/><table id = 'realmselect' class = 'styled-table'><tr><th>Realm</th><th>Description</th></tr>"
+                  for (realm of realms) {
+                    html += "<tr onclick = 'send_message(" + realm[0] + ");'><td>" + realm[1] + "</td><td>" + realm[2] + "</td></tr>"
+                  }
+                  f.innerHTML += html
+                } else if (msg.startsWith("CLANS:")) {
+                  f.innerHTML += "<br/>Select Starting Clan"
+                  clans = JSON.parse(msg.substring(6))
+                  html = "<br/><table id = 'clanselection' class = 'styled-table'><tr><th>Clan</th><th>Description</th></tr>"
+                  for (clan of clans) {
+                    html += "<tr onclick = 'send_message(" + clan[0] + ");'><td>" + clan[1] + "</td><td>" + clan[2] + "</td></tr>"
+                  }
+                  f.innerHTML += html
+                } else if (msg == "SUCCESS") {
+                  status = "connected"
+                  f.innerHTML += "<hr/>Registration Complete."
+                  status = "synopsis";
+                }
+              }
+              break;
+              case 'waiting':
+              if (msg == "FINISHED") {
+                status = "active"
+              } else {
+                if (msg.startsWith("NARRATION:")) {
+                  print_narration(f, msg.slice(10))
+                }
+              }
+              break;
+              default:
+              if (msg == "WELCOME") {
+                f.innerHTML += "<hr/>You may now interact with the world..."
+                status = "active"
+              } else if (msg.startsWith("NARRATION:")) {
                 print_narration(f, msg.slice(10))
+              } else if (msg.startsWith("STATUS:")){
+                print_notice(f, htmlEncode(msg.slice(7)))
               }
-            }
-            break;
-            default:
-            if (msg == "WELCOME") {
-              f.innerHTML += "<hr/>You may now interact with the world..."
-              status = "active"
-            } else if (msg.startsWith("NARRATION:")) {
-              print_narration(f, msg.slice(10))
-            } else if (msg.startsWith("STATUS:")){
-              print_notice(f, htmlEncode(msg.slice(7)))
             }
           }
           f.scrollTop = f.scrollHeight

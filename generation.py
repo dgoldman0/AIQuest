@@ -63,5 +63,6 @@ def generate_image(prompt, size = "256x256"):
                 tokens = completion['usage']['total_tokens']
                 token_use += tokens
             else:
-                print(e)
+                print("\Exception: " + str(e))
+                time.sleep(1)
     return url
