@@ -1,4 +1,4 @@
-The scenario includes main overarching elements of the current story arc, including the current motivations for the players.
+The scenario includes main overarching elements of the current story arc, including the current motivations for the players and their long term goals.
 
 World Overview:
 {}
