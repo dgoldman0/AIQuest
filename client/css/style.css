@@ -288,7 +288,6 @@ i.fas.fa-paper-plane{
 .narration-block img {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 	padding: 5px;
-  width: 250px;
 	float: right;
 }
 
@@ -300,8 +299,10 @@ i.fas.fa-paper-plane{
 
 .narration-block {
 	overflow: hidden
-	margin-top: 2px;
 	font-family: 'Awery', Arial, sans-serif;
 }
 
-.narration-block p:first-letter { font-size: 1.1em; }
+.narration-block p:first-letter {
+	margin-top: 2px;
+	font-size: 1.1em;
+}
