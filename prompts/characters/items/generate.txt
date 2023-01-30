@@ -1,4 +1,5 @@
-Most items are mundane in nature, often holding sentimental value. A few items have powerful abilities, but these items are rare. A novice is unlikely to have powerful items. The most powerful items will be found in the holdings of those of legendary status. 
+Most items are mundane in nature, often holding sentimental value. A few items have powerful abilities, but these items are rare. A novice is unlikely to have powerful items. The most powerful items will be found in the holdings of those of legendary status.
+
 Clan Name: {}
 
 Clan Description: {}

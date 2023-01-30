@@ -16,12 +16,14 @@ Setting:
 Player Characters:
 {}
 
-Players are coordinating what to do next. What information is needed to give an appropriate GM response to the following player message?
+Players are coordinating what to do this round. Determine whether additional information is needed to give a GM response.
 
 A new message has been received from {}.
 Message: {}
 
+Current Issue: {}
+
 Existing discussion between the players and the GM for the current round:
 {}
 
-Additional needed information (options are player spells, player abilities):
+Needed info (options: none, items, skills) | For Character

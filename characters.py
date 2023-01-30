@@ -49,11 +49,33 @@ def generate_character(level, clan_id, realm_id, x, y, user_id = None):
     features = call_openai(prompt, 512)
     id = data.add_character(clan_id, parameters[0], parameters[1], features, parameters[2], realm_id, x, y, user_id)
     print("Generating Character Items...")
-    prompt = generate_prompt("characters/generate_items", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
-    items = call_openai(prompt, 256)
+    items = None
+    while items is None:
+        prompt = generate_prompt("characters/items/generate", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
+        response = call_openai(prompt, 256)
+        lines = response.split('\n\n')
+        invalid = False
+        for line in lines:
+            if len(line.split('|')) != 3:
+                print("Retrying...")
+                invalid = True
+                break
+        if not invalid:
+            items = response
     data.set_character_items(id, items)
     print("Generating Character Skills...")
-    prompt = generate_prompt("characters/generate_skills", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
-    skills = call_openai(prompt, 256)
+    skills = None
+    while skills is None:
+        prompt = generate_prompt("characters/skills/generate", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
+        response = call_openai(prompt, 256)
+        lines = response.split('\n\n')
+        invalid = False
+        for line in lines:
+            if len(line.split('|')) != 3:
+                print("Retrying...")
+                invalid = True
+                break
+        if not invalid:
+            skills = response
     data.set_character_skills(id, skills)
     return id

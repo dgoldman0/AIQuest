@@ -1,6 +1,5 @@
 import bcrypt
 import sqlite3
-import magic
 import realms
 
 # Might be interesting to allow multiple worlds/realms at some point.
@@ -229,7 +228,7 @@ def add_character(clan_id, name, background, physical_features, affinities, real
 def set_character_location(character_id, realm_id, x, y):
     global database
     cur = database.cursor()
-    cur.execute("UPDATE CHARACTER_LOCATION SET realm_id = ?, x = ?, y = ? WHERE character_id = ?", (realm_id, x, y, character_id, ))
+    cur.execute("UPDATE CHARACTER_STATUS SET realm_id = ?, x = ?, y = ? WHERE character_id = ?", (realm_id, x, y, character_id, ))
     database.commit()
 
 def set_character_items(character_id, items):
