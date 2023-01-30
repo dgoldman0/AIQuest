@@ -11,6 +11,7 @@ discussion = ""
 data = None
 websockets = {}
 user_states = {}
+processing = False
 
 def inject_data(_data):
     global data
@@ -29,7 +30,6 @@ def img_realm(description, history):
         if len(summary) < 1000:
             image_prompt = summary
     image_url = generate_image(image_prompt)
-
 
 # Welcome new player.
 async def welcome(user_id, character_id, clan_id, realm_id, x, y):
@@ -90,6 +90,9 @@ async def load(user_id):
     state['realm_id'] = realm_id
     state['x'] = x
     state['y'] = y
+    for playersocket in websockets:
+        if playersocket != websocket:
+            websocket.send("SYSTEM:LOGIN!" + character[0])
     await handle_interactions(user_id)
 
 async def handle_interactions(user_id):
@@ -141,8 +144,13 @@ async def handle_interactions(user_id):
             await websocket.send("NARRATION:![Current](" + image_url + ")" + current.replace('\n', '\n\n'))
             await websocket.send("WELCOME")
         message = await websocket.recv()
+        processing = True
+        # Send message to all clients. This message also indicates that the system is going to be processing this message and therefore all clients should wait for "SYSTEM:FINISHED"
+        for playersocket in websockets:
+            if playersocket != websocket:
+                await playersocket.send("PLAYER:" + character[0] + "!" + message)
         # Replace round_duration with "current issue." Then ask something like "have the players addressed the current issue?"
-        if message.startswith("MSG:"):
+        if not processing and message.startswith("MSG:"):
             message = message[4:]
             # For now it's just the one character, but that'll change over time.
             players = character[0]
@@ -302,5 +310,8 @@ async def handle_interactions(user_id):
                 discussion += "GM Response: " + gm_response + '\n'
                 await websocket.send("NARRATION:" + gm_response)
         else:
-            pass
-        await websocket.send("FINISHED") # Indicates finished with current narration.
+            if processing:
+                await websocket.send("SYSTEM:PROCESSING")
+        for playersocket in websockets:
+            await playersocket.send("SYSTEM:FINISHED")
+            processing = False

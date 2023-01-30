@@ -2,6 +2,7 @@
 
 ws = null;
 status = "connecting";
+username = ""
 
 function htmlEncode(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -11,9 +12,12 @@ async function send_message(msg) {
   await ws.send(msg)
 }
 
-function print_player(f, message) {
+function print_player(f, message, uname = null) {
+  if (uname == null) {
+    uname = username
+  }
   converter = new showdown.Converter()
-  f.innerHTML += `<hr/><div class = "player-block">${converter.makeHtml(message)}</div>`
+  f.innerHTML += `<hr/><div class = "player-block">${uname}: ${converter.makeHtml(message)}</div>`
 }
 
 function print_narration(f, message) {
@@ -29,9 +33,6 @@ $(document).ready(function() {
   const f = document.getElementById("chat-history");
   f.innerHTML = "AIQuest Console..."
   const urlParams = new URLSearchParams(window.location.search);
-  // Yes I know this isn't a secure way to do things, but for now it's fine and I'm too exhausted to create a better system.
-  username = "GUEST"
-  password = ""
   url = "ws://localhost:9289"
   activity = null;
 
@@ -48,9 +49,15 @@ $(document).ready(function() {
           if (msg.startsWith("SYSTEM:")) {
             if (msg == "SYSTEM:MALICIOUS") {
               print_notice(f, "The system has detected that your message may be malicious...")
+            } else if (msg == "SYSTEM:PROCESSING") {
+              status = "waiting"
+            } else if (msg.startsWith("PLAYER:")) {
+              cut = msg.indexOf("!")
+              player = msg.substring(7, cut)
+              msg = msg.substring(cut + 1)
+              print_player(f, msg, player)
             }
           } else {
-
             switch (status) {
               case 'connecting':
               if (msg == "AIQuest") {
@@ -106,7 +113,7 @@ $(document).ready(function() {
               }
               break;
               case 'waiting':
-              if (msg == "FINISHED") {
+              if (msg == "SYSTEM:FINISHED") {
                 status = "active"
               } else {
                 if (msg.startsWith("NARRATION:")) {
