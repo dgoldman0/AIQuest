@@ -1,0 +1,19 @@
+Skill generation. A skill is an ability, magical or physical. Some skills are offensive. Others are defensive. Some skills are support skills, such as healing or boosting other peoples' skills.
+
+Novice skills should be weak and have limited effect. Initiate skills are slightly more powerful. Adept skills are harder to learn but are more powerful. Expert skills improve on adept skills. Master skills are rare and can have significant effects. Legendary are incredibly powerful skills that can fundamentally change the course of the game.
+
+Clan Name: {}
+
+Clan Description: {}
+
+Character Background: {}
+
+Physical Description: {}
+
+Character Elements: {}
+
+Character Level: {}
+
+Generate five skills.
+
+Skill Name | Skill Effects | Potential Side Effects

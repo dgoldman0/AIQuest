@@ -26,24 +26,34 @@ def generate_clans(realm_id, name, setting, history):
     for clan in clanlist:
         columns = [column.strip() for column in clan[clan.index(".") + 1:].split("|")]
         prompt = generate_prompt("clans/generate_features", (columns[0], columns[2], ))
-        features = call_openai(prompt, 1024)
+        features = call_openai(prompt, 512)
         columns.insert(3, features)
         clans.append(columns)
     print("Clans: " + str(clans))
     data.add_clans(realm_id, clans)
 
 def generate_character(level, clan_id, realm_id, x, y, user_id = None):
-    print("Generating Character")
+    print("Generating Character...")
     realm = data.get_realm(realm_id)
     clan = data.get_clan(clan_id)
     cnt = 0
     while cnt != 3:
         prompt = generate_prompt("characters/generate_character", (realm[1], clan[0], clan[1], clan[3], level, ))
-        list = call_openai(prompt, 1024)
+        list = call_openai(prompt, 512)
         parameters = [parameter.strip() for parameter in list.split('|')]
         cnt = len(parameters)
         if cnt != 3:
             print("Incorrect arg count. Trying again...")
+    print("Generating Character Features...")
     prompt = generate_prompt("characters/generate_features", (clan[0], clan[1], clan[2], parameters[0], parameters[1], ))
-    features = call_openai(prompt, 1024)
-    return data.add_character(clan_id, parameters[0], parameters[1], features, parameters[2], realm_id, x, y, user_id)
+    features = call_openai(prompt, 512)
+    id = data.add_character(clan_id, parameters[0], parameters[1], features, parameters[2], realm_id, x, y, user_id)
+    print("Generating Character Items...")
+    prompt = generate_prompt("characters/generate_items", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
+    items = call_openai(prompt, 256)
+    data.set_character_items(id, items)
+    print("Generating Character Skills...")
+    prompt = generate_prompt("characters/generate_skills", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
+    skills = call_openai(prompt, 256)
+    data.set_character_skills(id, skills)
+    return id

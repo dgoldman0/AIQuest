@@ -1,0 +1,16 @@
+Most items are mundane in nature, often holding sentimental value. A few items have powerful abilities, but these items are rare. A novice is unlikely to have powerful items. The most powerful items will be found in the holdings of those of legendary status. 
+Clan Name: {}
+
+Clan Description: {}
+
+Character Background: {}
+
+Physical Description: {}
+
+Character Elements: {}
+
+Character Level: {}
+
+Create a set of ten items for this person. Items may hold sentimental value for the character. If an item has an ability, its strength should be limited by the character level. Items with abilities are rare, so most items should be sentimental or relate to the story.
+
+Item Name | Item Effects (may be sentimental or something picked up) | Potential Side Effects (if the item has any effects)

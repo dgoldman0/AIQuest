@@ -36,23 +36,21 @@ def init():
             password = bcrypt.hashpw(password1.encode(), salt)
             cur.execute("INSERT INTO USERS (username, passwd, salt, admin) VALUES (?, ?, ?, ?);", (username, password, salt, True))
             cur.execute("CREATE TABLE CHARACTERS (user_id INT, name TEXT NOT NULL);")
+            # More permanent details about the character.
             cur.execute("CREATE TABLE CHARACTER_DETAILS (character_id INT NOT NULL, clan_id INT NOT NULL, background TEXT NOT NULL, physical_features TEXT NOT NULL, affinities TEXT NOT NULL);")
-            cur.execute("CREATE TABLE CHARACTER_LOCATION (character_id INT NOT NULL, realm_id INT NOT NULL, x INT NOT NULL, y INT NOT NULL);")
+            # Includes current location, as well as current items and skills.
+            cur.execute("CREATE TABLE CHARACTER_STATUS (character_id INT NOT NULL, realm_id INT NOT NULL, x INT NOT NULL, y INT NOT NULL, items TEXT, skills TEXT);")
             # Basic World Settings Table
             cur.execute("CREATE TABLE REALMS (name TEXT NOT NULL, setting TEXT NOT NULL, history TEXT NOT NULL);")
             # Clan List Table
             cur.execute("CREATE TABLE CLANS (realm_id INT NOT NULL, name TEXT NOT NULL, short_description TEXT NOT NULL, long_description TEXT NOT NULL, physical_features TEXT NOT NULL, affinities TEXT NOT NULL);")
-            # Create spell tables.
-            cur.execute("CREATE TABLE SPELLS (name TEXT NOT NULL, elements TEXT NOT NULL, tier TEXT NOT NULL, cost INT NOT NULL, description TEXT NOT NULL, mishaps TEXT);")
             # Create map tables.
             cur.execute("CREATE TABLE MAPS (realm INT NOT NULL DEFAULT 0, x INT NOT NULL, y INT NOT NULL, last_explored INT NOT NULL DEFAULT -1, description TEXT NOT NULL, items TEXT);")
-            # Will eventually have multiple scenarios for different groups, etc. User_INFO and scenarios will be merged and altered to handle multiple players, etc.
+            # Will have to work on adding groups/parties. Scenarios will go under party info.
             cur.execute("CREATE TABLE SCENARIOS (scenario TEXT NOT NULL);")
             database.commit()
             # Create initial realm.
             realms.create_realm()
-            # Initialize novice spells.
-#            magic.initialize_spells()
 
 # User Data
 def get_user(user_id):
@@ -189,12 +187,12 @@ def get_user_character(user_id, full = False):
     global database
     cur = database.cursor()
     if full:
-        sql = """SELECT c.name, cd.clan_id, cd.background, cd.physical_features, cd.affinities, cl.realm_id, cl.x, cl.y
+        sql = """SELECT c.name, cd.clan_id, cd.background, cd.physical_features, cd.affinities, cs.realm_id, cs.x, cs.y
         FROM characters c
         JOIN character_details cd
         ON c.rowid = cd.character_id
-        JOIN character_location cl
-        ON cd.character_id = cl.character_id
+        JOIN character_status cs
+        ON cd.character_id = cs.character_id
         WHERE c.user_id = ?"""
         res = cur.execute(sql, (user_id,))
     else:
@@ -205,12 +203,12 @@ def get_character(character_id, full = False):
     global database
     cur = database.cursor()
     if full:
-        sql = """SELECT c.name, cd.clan_id, cd.background, cd.physical_features, cd.affinities, cl.realm_id, cl.x, cl.y
+        sql = """SELECT c.name, cd.clan_id, cd.background, cd.physical_features, cd.affinities, cs.realm_id, cs.x, cs.y
         FROM characters c
         JOIN character_details cd
         ON c.rowid = cd.character_id
-        JOIN character_location cl
-        ON cd.character_id = cl.character_id
+        JOIN character_status cs
+        ON cd.character_id = cs.character_id
         WHERE cd.character_id = ?"""
 
         res = cur.execute(sql, (character_id,))
@@ -224,7 +222,7 @@ def add_character(clan_id, name, background, physical_features, affinities, real
     cur.execute("INSERT INTO CHARACTERS (user_id, name) VALUES (?, ?);", (user_id, name))
     character_id = cur.lastrowid
     cur.execute("INSERT INTO CHARACTER_DETAILS (character_id, clan_id, background, physical_features, affinities) VALUES (?, ?, ?, ?, ?)", (character_id, clan_id, background, physical_features, affinities, ))
-    cur.execute("INSERT INTO CHARACTER_LOCATION (character_id, realm_id, x, y) VALUES (?, ?, ?, ?)", (character_id, realm_id, x, y, ))
+    cur.execute("INSERT INTO CHARACTER_STATUS (character_id, realm_id, x, y) VALUES (?, ?, ?, ?)", (character_id, realm_id, x, y, ))
     database.commit()
     return character_id
 
@@ -234,10 +232,29 @@ def set_character_location(character_id, realm_id, x, y):
     cur.execute("UPDATE CHARACTER_LOCATION SET realm_id = ?, x = ?, y = ? WHERE character_id = ?", (realm_id, x, y, character_id, ))
     database.commit()
 
-def update_character_background(character_id, background):
+def set_character_items(character_id, items):
     global database
     cur = database.cursor()
+    cur.execute("UPDATE CHARACTER_STATUS SET items = ? WHERE character_id = ?", (items, character_id, ))
     database.commit()
+
+def get_character_items(character_id):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT items FROM CHARACTER_STATUS WHERE rowid = ?;", (character_id, ))
+    return res.fetchone()
+
+def set_character_skills(character_id, skills):
+    global database
+    cur = database.cursor()
+    cur.execute("UPDATE CHARACTER_STATUS SET skills = ? WHERE character_id = ?", (skills, character_id, ))
+    database.commit()
+
+def get_character_skills(character_id):
+    global database
+    cur = database.cursor()
+    res = cur.execute("SELECT skills FROM CHARACTER_STATUS WHERE rowid = ?;", (character_id, ))
+    return res.fetchone()
 
 # Map Data
 def map_initialized(realm = 0):
