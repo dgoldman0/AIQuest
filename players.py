@@ -67,7 +67,6 @@ async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     # Check if scenario already exists. If not, create one.
     await handle_interactions(user_id)
 
-
 async def load(user_id):
     global websockets, user_states
     state = {}
@@ -90,7 +89,7 @@ async def load(user_id):
     state['realm_id'] = realm_id
     state['x'] = x
     state['y'] = y
-    for playersocket in websockets:
+    for playersocket in websockets.values():
         if playersocket != websocket:
             websocket.send("SYSTEM:LOGIN!" + character[0])
     await handle_interactions(user_id)
@@ -146,7 +145,7 @@ async def handle_interactions(user_id):
         message = await websocket.recv()
         processing = True
         # Send message to all clients. This message also indicates that the system is going to be processing this message and therefore all clients should wait for "SYSTEM:FINISHED"
-        for playersocket in websockets:
+        for playersocket in websockets.values():
             if playersocket != websocket:
                 await playersocket.send("PLAYER:" + character[0] + "!" + message)
         # Replace round_duration with "current issue." Then ask something like "have the players addressed the current issue?"
@@ -312,6 +311,6 @@ async def handle_interactions(user_id):
         else:
             if processing:
                 await websocket.send("SYSTEM:PROCESSING")
-        for playersocket in websockets:
+        for playersocket in websockets.values():
             await playersocket.send("SYSTEM:FINISHED")
             processing = False

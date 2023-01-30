@@ -2,7 +2,7 @@
 
 ws = null;
 status = "connecting";
-username = ""
+username = "Guest"
 
 function htmlEncode(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -17,7 +17,7 @@ function print_player(f, message, uname = null) {
     uname = username
   }
   converter = new showdown.Converter()
-  f.innerHTML += `<hr/><div class = "player-block">${uname}: ${converter.makeHtml(message)}</div>`
+  f.innerHTML += `<hr/><div class = "player-block">${converter.makeHtml(uname + ": " + message)}</div>`
 }
 
 function print_narration(f, message) {
@@ -27,6 +27,21 @@ function print_narration(f, message) {
 
 function print_notice(f, notice) {
   f.innerHTML += `<hr/>System Notice: ${notice}`
+}
+
+function set_waiting() {
+  console.log("Waiting")
+  const s = document.getElementById("submit");
+  const w = document.getElementById("waiting");
+  s.style.visibility = "hidden"
+  w.style.visibility = "visible"
+}
+
+function set_done() {
+  const s = document.getElementById("submit");
+  const w = document.getElementById("waiting");
+  s.style.visibility = "visible"
+  w.style.visibility = "hidden"
 }
 
 $(document).ready(function() {
@@ -50,8 +65,11 @@ $(document).ready(function() {
             if (msg == "SYSTEM:MALICIOUS") {
               print_notice(f, "The system has detected that your message may be malicious...")
             } else if (msg == "SYSTEM:PROCESSING") {
+              set_waiting()
               status = "waiting"
             } else if (msg.startsWith("PLAYER:")) {
+              set_waiting()
+              status = "waiting"
               cut = msg.indexOf("!")
               player = msg.substring(7, cut)
               msg = msg.substring(cut + 1)
@@ -106,6 +124,7 @@ $(document).ready(function() {
                   }
                   f.innerHTML += html
                 } else if (msg == "SUCCESS") {
+                  set_done()
                   status = "connected"
                   f.innerHTML += "<hr/>Registration Complete."
                   status = "synopsis";
@@ -115,6 +134,7 @@ $(document).ready(function() {
               case 'waiting':
               if (msg == "SYSTEM:FINISHED") {
                 status = "active"
+                set_done()
               } else {
                 if (msg.startsWith("NARRATION:")) {
                   print_narration(f, msg.slice(10))
@@ -125,6 +145,7 @@ $(document).ready(function() {
               if (msg == "WELCOME") {
                 f.innerHTML += "<hr/>You may now interact with the world..."
                 status = "active"
+                set_done()
               } else if (msg.startsWith("NARRATION:")) {
                 print_narration(f, msg.slice(10))
               } else if (msg.startsWith("STATUS:")){
@@ -154,6 +175,7 @@ $(document).ready(function() {
             break;
             case 'LOGIN':
             if (status != "connected") {
+              set_waiting()
               username = args[1]
               password = args[2]
               activity = "login"
@@ -191,7 +213,10 @@ $(document).ready(function() {
             f.scrollTop = f.scrollHeight
           }
         } else {
-          status = "waiting"
+          if (status == "connected") {
+            status = "waiting"
+            set_waiting()
+          }
           print_player(f, htmlEncode(msg))
           f.scrollTop = f.scrollHeight
           await ws.send("MSG:" + msg);
