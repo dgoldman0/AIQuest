@@ -124,7 +124,6 @@ $(document).ready(function() {
                   }
                   f.innerHTML += html
                 } else if (msg == "SUCCESS") {
-                  set_done()
                   status = "connected"
                   f.innerHTML += "<hr/>Registration Complete."
                   status = "synopsis";
