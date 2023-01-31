@@ -25,5 +25,6 @@ Current Issue: {}
 
 Existing discussion between the players and the GM for the current round:
 {}
+End of Discussion
 
 GM Response (any actions need to be held for the round):

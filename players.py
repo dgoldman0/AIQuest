@@ -32,13 +32,12 @@ def img_realm(description, history):
 # Welcome new player.
 async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     # Currently uses global which is bad because it's not unique for each user.
-    global websockets, user_states, scenario
+    global websockets, user_states, scenario, players
     state = {}
     user_states[user_id] = state
 
     websocket = websockets[user_id]
     character = data.get_character(character_id, True)
-    players[character[0]] = user_id
     realm = data.get_realm(character[5])
     prompt = generate_prompt("interactions/introduce_realm", (realm[0], realm[1], realm[2], ))
     introduction = call_openai(prompt, 512)
@@ -56,12 +55,13 @@ async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     await load(user_id)
 
 async def load(user_id):
-    global websockets, user_states
+    global websockets, user_states, players
     state = {}
     user_states[user_id] = state
     websocket = websockets[user_id]
     # Load settings from previous state.
     character = data.get_user_character(user_id, True)
+    players[character[0]] = user_id
     realm_id = character[5]
     clan_id = character[1]
     x = character[6]
@@ -83,7 +83,7 @@ async def load(user_id):
     await handle_interactions(user_id)
 
 async def handle_interactions(user_id):
-    global websockets, user_states, scenario, discussion
+    global websockets, user_states, scenario, discussion, processing
     state = user_states[user_id]
     websocket = websockets[user_id]
     # Handle user commands.
@@ -100,6 +100,11 @@ async def handle_interactions(user_id):
         scenario = data.get_scenario()
         setting = data.get_current_setting(user_id)
         story = data.get_story(user_id)
+        player_list = ""
+        for player in players.keys():
+            player_list += player + '\n'
+        player_list = player_list.strip()
+
         if scenario is None:
             # setting, history, location details, location items, player's character name, player background, player clan, clan description
             prompt = generate_prompt("storyline/create_scenario", (realm[1], realm[2], location[1], location[2], character[0], character[2], clan[0], clan[2]))
@@ -131,11 +136,6 @@ async def handle_interactions(user_id):
             await websocket.send("NARRATION:![Current](" + image_url + ")" + current.replace('\n', '\n\n'))
             await websocket.send("WELCOME")
         message = await websocket.recv()
-        processing = True
-        # Send message to all clients. This message also indicates that the system is going to be processing this message and therefore all clients should wait for "SYSTEM:FINISHED"
-        for playersocket in websockets.values():
-            if playersocket != websocket:
-                await playersocket.send("PLAYER:" + character[0] + "!" + message)
         # Replace round_duration with "current issue." Then ask something like "have the players addressed the current issue?"
         if not processing and message.startswith("MSG:"):
             message = message[4:]
@@ -145,16 +145,21 @@ async def handle_interactions(user_id):
             if malicious.lower().startswith("yes"):
                 await websocket.send("SYSTEM:MALICIOUS")
             else:
-                discussion += character[0] + ": " + message + '\n'
+                # Send message to all clients. This message also indicates that the system is going to be processing this message and therefore all clients should wait for "SYSTEM:FINISHED"
+                processing = True
+                for playersocket in websockets.values():
+                    if playersocket != websocket:
+                        await playersocket.send("PLAYER:" + character[0] + "!" + message)
                 decided = ""
                 prompt = generate_prompt("logic/check_question", (message, ))
                 question = call_openai(prompt, 32)
                 if question.lower().startswith("no"):
-                    prompt = generate_prompt("logic/check_players_decided", (current_issue, players.keys(), discussion, ))
+                    prompt = generate_prompt("logic/check_players_decided", (current_issue, player_list, discussion, ))
                     decided = call_openai(prompt, 32)
 
                 if decided.lower().startswith("yes"):
-                    prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, players.keys(), current_issue, discussion, ))
+                    discussion += character[0] + ": " + message + '\n'
+                    prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, player_list, current_issue, discussion, ))
                     gm_response = call_openai(prompt, 256)
                     # Check update for setting, location items, location details, and
                     # Check update might work well in Curie in which case I could save a few cents.
@@ -166,11 +171,11 @@ async def handle_interactions(user_id):
 
                     # Maybe combine setting revision and changes in one chunk so it can be coordinated in correct order
                     old_setting = setting
-                    prompt = generate_prompt("logic/check_update_setting", (realm[1], location[1], location[2], scenario, setting, players.keys(), character[0], message, discussion, ))
+                    prompt = generate_prompt("logic/check_update_setting", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, discussion, ))
                     response = call_openai(prompt, 32)
                     if response.lower().startswith("yes"):
                         changed = True
-                        prompt = generate_prompt("storyline/update_setting", (realm[1], setting, location[1], location[2], scenario, players.keys(), discussion, ))
+                        prompt = generate_prompt("storyline/update_setting", (realm[1], setting, location[1], location[2], scenario, player_list, discussion, ))
                         response = None
                         while response is None:
                             response = call_openai(prompt, 1024)
@@ -188,12 +193,12 @@ async def handle_interactions(user_id):
 
                     old_items = location[2]
                     # Should start wrapping these in methods and putting them into their correct files. For instance, maps.check_update_features()
-                    prompt = generate_prompt("logic/check_update_location_features", (realm[1], setting, location[1], location[2], scenario, players.keys(), discussion, ))
+                    prompt = generate_prompt("logic/check_update_location_features", (realm[1], setting, location[1], location[2], scenario, player_list, discussion, ))
                     response = call_openai(prompt, 32)
                     if response.lower().startswith("yes"):
                         changed = True
                         # Should do a sanity check on items to make sure the dimensions make sense.
-                        prompt = generate_prompt("maps/update_location_features", (realm[1], setting, location[1], location[2], scenario, players.keys(), discussion, ))
+                        prompt = generate_prompt("maps/update_location_features", (realm[1], setting, location[1], location[2], scenario, player_list, discussion, ))
                         response = None
                         while response is None:
                             response = call_openai(prompt, 1024)
@@ -211,11 +216,11 @@ async def handle_interactions(user_id):
                         items_progression = "None"
 
                     old_details = location[1]
-                    prompt = generate_prompt("logic/check_update_details", (realm[1], setting, location[1], location[2], scenario, players.keys(), discussion, ))
+                    prompt = generate_prompt("logic/check_update_details", (realm[1], setting, location[1], location[2], scenario, player_list, discussion, ))
                     response = call_openai(prompt, 32)
                     if response.lower().startswith("yes"):
                         changed = True
-                        prompt = generate_prompt("maps/update_location_details", (realm[1], setting, location[1], location[2], scenario, players.keys(), discussion, ))
+                        prompt = generate_prompt("maps/update_location_details", (realm[1], setting, location[1], location[2], scenario, player_list, discussion, ))
                         response = None
                         while response is None:
                             response = call_openai(prompt, 1024)
@@ -232,11 +237,11 @@ async def handle_interactions(user_id):
                         details_progression = "None"
 
                     old_scenario = scenario
-                    prompt = generate_prompt("logic/check_update_scenario", (realm[1], setting, location[1], location[2], scenario, players.keys(), discussion, ))
+                    prompt = generate_prompt("logic/check_update_scenario", (realm[1], setting, location[1], location[2], scenario, player_list, discussion, ))
                     response = call_openai(prompt, 32)
                     if response.lower().startswith("yes"):
                         changed = True
-                        prompt = generate_prompt("storyline/update_scenario", (realm[1], setting, location[1], location[2], scenario, players.keys(), discussion, ))
+                        prompt = generate_prompt("storyline/update_scenario", (realm[1], setting, location[1], location[2], scenario, player_list, discussion, ))
                         response = None
                         while response is None:
                             response = call_openai(prompt, 1024)
@@ -284,24 +289,56 @@ async def handle_interactions(user_id):
                         await websocket.send("NARRATION:![GM Response](" + image_url + ")" + gm_response.replace('\n', '\n\n'))
                     discussion = ""
                 elif decided.lower().startswith("unsure"):
-                    prompt = generate_prompt("interactions/request_clarification", (discussion, players.keys(), ))
+                    discussion += character[0] + ": " + message + '\n'
+                    prompt = generate_prompt("interactions/request_clarification", (discussion, player_list, ))
                     gm_response = call_openai(prompt, 256)
                 else:
                     cnt = 0
                     parameters = None
-                    while cnt != 2:
-                        prompt = generate_prompt("logic/check_needed_info", (realm[1], location[1], location[2], scenario, setting, players.keys(), character[0], message, current_issue, discussion, ))
+                    while cnt != 3:
+                        prompt = generate_prompt("logic/items/check_items", (character[0], message, ))
                         list = call_openai(prompt, 32)
                         parameters = [parameter.strip() for parameter in list.split('|')]
                         cnt = len(parameters)
-                        if cnt != 2:
+                        if cnt != 3:
                             print("Incorrect arg count. Trying again...")
-                    if parameters[0].lower() == ("skills"):
-                        pass
-                    elif parameters[0].lower() == ("items"):
-                        pass
-                    prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, players.keys(), character[0], message, current_issue, discussion, ))
+                    if parameters[0].lower() == "yes":
+                        character_id = data.get_character_id(parameters[1])
+                        if character_id is not None:
+                            character_items = data.get_character_items(character_id)
+                            prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, character_items))
+                            injection = call_openai(prompt, 64)
+                            discussion += "GM Note: " + injection + '\n'
+                        else:
+                            # Should it do something here, like look for other possible options?
+                            pass
+                    # Do I check both items and skills independently?
+                    cnt = 0
+                    parameters = None
+                    while cnt != 3:
+                        prompt = generate_prompt("logic/skills/check_skills", (character[0], message, ))
+                        list = call_openai(prompt, 32)
+                        parameters = [parameter.strip() for parameter in list.split('|')]
+                        cnt = len(parameters)
+                        if cnt != 3:
+                            print("Incorrect arg count. Trying again...")
+                    if parameters[0].lower() == "yes":
+                        character_id = data.get_character_id(parameters[1])
+                        if character_id is not None:
+                            character_skills = data.get_character_skills(character_id)
+                            prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, character_skill))
+                            injection = call_openai(prompt, 64)
+                            discussion += "GM Note: " + injection + '\n'
+                        else:
+                            # Should it do something here, like look for other possible options?
+                            pass
+                    discussion += character[0] + ": " + message + '\n'
+                    prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, current_issue, discussion, ))
                     gm_response = call_openai(prompt, 256)
+
+                processing = False
+                for playersocket in websockets.values():
+                    await playersocket.send("SYSTEM:FINISHED")
 
                 # Check if discussion was cleared (in other words if the round has played out)
                 if discussion != "":
@@ -310,6 +347,3 @@ async def handle_interactions(user_id):
         else:
             if processing:
                 await websocket.send("SYSTEM:PROCESSING")
-        for playersocket in websockets.values():
-            await playersocket.send("SYSTEM:FINISHED")
-            processing = False

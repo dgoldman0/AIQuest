@@ -215,6 +215,27 @@ def get_character(character_id, full = False):
         res = cur.execute("SELECT user_id, name FROM CHARACTERS WHERE rowid = ?;", (character_id, ))
     return res.fetchone()
 
+def get_character_id(name):
+    global database
+    cur = database.cursor()
+    sql = "SELECT rowid FROM CHARACTERS WHERE name = ?;"
+    res = cur.execute(sql, (character_name,))
+    return res.fetchone()
+
+def get_character_by_name(character_name, full = False):
+    global database
+    cur = database.cursor()
+    if full:
+        sql = """SELECT c.name, cd.clan_id, cd.background, cd.physical_features, cd.affinities, cs.realm_id, cs.x, cs.y
+        FROM characters c
+        JOIN character_details cd
+        ON c.rowid = cd.character_id
+        JOIN character_status cs
+        ON cd.character_id = cs.character_id
+        WHERE c.character_name = ?"""
+
+        res = cur.execute(sql, (character_name,))
+
 def add_character(clan_id, name, background, physical_features, affinities, realm_id, x, y, user_id):
     global database
     cur = database.cursor()
