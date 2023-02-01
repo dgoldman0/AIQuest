@@ -219,8 +219,12 @@ def get_character_id(name):
     global database
     cur = database.cursor()
     sql = "SELECT rowid FROM CHARACTERS WHERE name = ?;"
-    res = cur.execute(sql, (character_name,))
-    return res.fetchone()
+    res = cur.execute(sql, (name,))
+    resp = res.fetchone()
+    if resp is not None:
+        return resp[0]
+    else:
+        return None
 
 def get_character_by_name(character_name, full = False):
     global database

@@ -2,6 +2,8 @@ A new message has been received from {}: {}
 
 Is this message about an object?
 
-Use a table format to answer: About Object | Whose Object | What Object
+Objects can be general, such as "anything" or "something."
+
+Use a table format to answer: About Object | Whose Object (do not use possessive) | What Object
 
 About Object (yes or no) | Whose Object (or N/A) | What Object (or N/A)

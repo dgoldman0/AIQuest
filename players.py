@@ -3,6 +3,8 @@ from generation import call_openai
 from generation import generate_image
 import maps
 
+# Note: Probably should be grabbing character by id only. Getting character id from name will be a problem if two people have the same name. But I guess I can just force unique names.
+
 players = {}
 discussion = ""
 
@@ -304,14 +306,17 @@ async def handle_interactions(user_id):
                             print("Incorrect arg count. Trying again...")
                     if parameters[0].lower() == "yes":
                         character_id = data.get_character_id(parameters[1])
+                        character_items = ""
                         if character_id is not None:
                             character_items = data.get_character_items(character_id)
-                            prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, character_items))
-                            injection = call_openai(prompt, 64)
-                            discussion += "GM Note: " + injection + '\n'
                         else:
-                            # Should it do something here, like look for other possible options?
-                            pass
+                            # If N/A assume it's about the currnet player.
+                            character_items = data.get_character_items(get_character_id(character[0]))
+
+                        prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, character_items))
+                        injection = call_openai(prompt, 64)
+                        discussion += "GM Note: " + injection + '\n'
+
                     # Do I check both items and skills independently?
                     cnt = 0
                     parameters = None
@@ -324,14 +329,16 @@ async def handle_interactions(user_id):
                             print("Incorrect arg count. Trying again...")
                     if parameters[0].lower() == "yes":
                         character_id = data.get_character_id(parameters[1])
+                        character_skills = ""
                         if character_id is not None:
                             character_skills = data.get_character_skills(character_id)
-                            prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, character_skill))
-                            injection = call_openai(prompt, 64)
-                            discussion += "GM Note: " + injection + '\n'
                         else:
-                            # Should it do something here, like look for other possible options?
-                            pass
+                            # If N/A assume it's about the currnet player.
+                            character_skills = data.get_character_skills(get_character_id(character[0]))
+
+                        prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, character_skills))
+                        injection = call_openai(prompt, 64)
+                        discussion += "GM Note: " + injection + '\n'
                     discussion += character[0] + ": " + message + '\n'
                     prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, current_issue, discussion, ))
                     gm_response = call_openai(prompt, 256)

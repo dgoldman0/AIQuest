@@ -2,6 +2,8 @@ A new message has been received from {}: {}
 
 Is this message about a skill or ability?
 
-Use a table format to answer: What Skill | Whose Skill
+Skills can be general, such as "anything" or "something."
 
-What Skill | Whose Skill (or N/A)
+Use a table format to answer: About Skill | Whose Skill (do not use possessive) | What Skill
+
+About Skill (yes or no) | Whose Skill (or N/A) | What Skill (or N/A)
