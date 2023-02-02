@@ -313,7 +313,7 @@ async def handle_interactions(user_id):
                             # If N/A assume it's about the currnet player.
                             character_items = data.get_character_items(get_character_id(character[0]))
 
-                        prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, character_items))
+                        prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, parameters[2], character_items))
                         injection = call_openai(prompt, 64)
                         discussion += "GM Note: " + injection + '\n'
 
@@ -336,7 +336,7 @@ async def handle_interactions(user_id):
                             # If N/A assume it's about the currnet player.
                             character_skills = data.get_character_skills(get_character_id(character[0]))
 
-                        prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, character_skills))
+                        prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, parameters[2], character_skills))
                         injection = call_openai(prompt, 64)
                         discussion += "GM Note: " + injection + '\n'
                     discussion += character[0] + ": " + message + '\n'
