@@ -67,6 +67,8 @@ $(document).ready(function() {
             } else if (msg == "SYSTEM:PROCESSING") {
               set_waiting()
               status = "waiting"
+            } else if (msg.startsWith("SYSTEM:LOGIN!")) {
+              print_notice(f, "A user has joined the game. Player character: " + msg.substring(13))
             } else if (msg.startsWith("PLAYER:")) {
               set_waiting()
               status = "waiting"
