@@ -1,0 +1,28 @@
+The round plays out successfully.
+
+World Overview:
+{}
+
+Location Details:
+{}
+
+Location Features:
+Feature ID | Feature | Description | Location | Dimensions
+{}
+
+Current Scenario: {}
+
+Setting:
+{}
+
+Player Characters:
+{}
+
+Players are coordinating what to do this round. All players have decided what to do.
+
+Current Issue: {}
+
+Existing discussion between the players and the GM for the current round:
+{}
+
+Determine how the round plays out based on the discussion between the players and the GM (narrative):

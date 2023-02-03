@@ -2,9 +2,14 @@ from generation import generate_prompt
 from generation import call_openai
 from generation import generate_image
 import maps
+from random import randint
 
 # Note: Probably should be grabbing character by id only. Getting character id from name will be a problem if two people have the same name. But I guess I can just force unique names.
 
+# Will be based on party level at some point.
+skill = "master"
+# Difficulty will be set by the players in the future, and will range between novice, casual, standard, advanced, hardcore.
+difficulty = "advanced"
 players = {}
 discussion = ""
 
@@ -154,18 +159,61 @@ async def handle_interactions(user_id):
                     if playersocket != websocket:
                         await playersocket.send("PLAYER:" + character[0] + "!" + message)
                 decided = ""
-                prompt = generate_prompt("logic/check_question", (message, ))
-                question = call_openai(prompt, 32)
-                if question.lower().startswith("no"):
+                question = None
+                while question is None:
+                    prompt = generate_prompt("logic/check_question", (message, ))
+                    question = call_openai(prompt, 32).lower()
+                    if (not question.startswith("yes")) and (not question.startswith("no")):
+                        question = None
+                if question.startswith("no"):
                     prompt = generate_prompt("logic/check_players_decided", (current_issue, player_list, discussion, ))
                     decided = call_openai(prompt, 32)
 
                 if decided.lower().startswith("yes"):
                     discussion += character[0] + ": " + message + '\n'
-                    # So far progress_round does not do a good job of finding fun ways for things to go wrong.
-                    # Eventually there could be a difficulty setting. For now it's defaulted to master to try to get issues to generate.
-                    prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, player_list, current_issue, "master", discussion, ))
-                    gm_response = call_openai(prompt, 256)
+
+                    # Evaluate the amount of planning and based on the skill level determine whether something goes wrong and how badly.
+                    prompt = generate_prompt("logic/evaluate_planning", (current_issue, difficulty, player_list, discussion, ))
+                    # The worse the planning, the more likely it is that something will go wrong.
+                    leeway = None
+                    # After deciding whether a failure occurs, the combination of bonuses and penalties will determine how badly it goes wrong.
+                    bonuses = {'novice': 0, 'initiate': 1, 'adept': 2, 'expert': 3, 'master': 4, 'legendary': 5}
+                    bonus = bonuses[skill]
+                    penalty = 0
+                    while leeway is None:
+                        planning = call_openai(prompt, 32).lower()
+                        if planning.startswith("poor"):
+                            leeway = 2
+                            penalty = 5
+                        elif planning.startswith("below average"):
+                            leeway = 4
+                            penalty = 4
+                        elif planning.startswith("adequate"):
+                            leeway = 8
+                            penalty = 3
+                        elif planning.startswith("good"):
+                            leeway = 10
+                            penalty = 2
+                        elif planning.startswith("excellent"):
+                            leeway = 15
+                            penalty = 1
+                        elif planning.startswith("extraordinary"):
+                            leeway = 20
+                            penalty = 0
+
+                    # Roll dice and fail if they roll a 1.
+                    roll = randint(1, leeway)
+                    failure = (roll == 1)
+                    if not failure:
+                        prompt = generate_prompt("storyline/progress_successful_round", (realm[1], location[1], location[2], scenario, setting, player_list, current_issue, discussion, ))
+                        gm_response = call_openai(prompt, 512)
+                    else:
+                        failure_levels = ['minor mishap', 'setback', 'failure', 'disaster', 'catastrophe']
+                        cap = min(max(0, 4 - bonus + penalty), 4)
+                        failure_level = failure_levels[randint(0, cap)]
+                        prompt = generate_prompt("storyline/progress_failed_round", (realm[1], location[1], location[2], scenario, setting, player_list, current_issue, failure_level, discussion, ))
+                        gm_response = call_openai(prompt, 512)
+                    return # Temp for testing
                     setting_progression = None
                     items_progression = None
                     location_progression = None
@@ -281,6 +329,12 @@ async def handle_interactions(user_id):
                                 image_prompt = summary
                         image_url = generate_image(image_prompt)
                         await websocket.send("NARRATION:![Developments](" + image_url + ")" + developments.replace('\n', '\n\n'))
+                        # Determine player advancement.
+                        prompt = generate_prompt("logic/check_advancement", (story, scenario_progression, details_progression, items_progression, setting_progression, old_issue, current_issue, ))
+                        advance = call_openai(prompt, 32)
+                        if (advance.lower().startswith("yes")):
+                            for player_id in players.values():
+                                pass
                     else:
                         prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
                         image_prompt = None
