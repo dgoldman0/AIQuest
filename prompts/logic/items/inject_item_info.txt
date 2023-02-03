@@ -7,6 +7,6 @@ Guessed Item: {}
 Available Items:
 {}
 
-Based on the new message and the guessed item, pull pertinent information from available items.
+Based on the new message and the guessed item, pull pertinent information from available items, without altering the items or their functions.
 
 Extracted Information:

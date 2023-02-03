@@ -54,12 +54,15 @@ def generate_character(level, clan_id, realm_id, x, y, user_id = None):
         prompt = generate_prompt("characters/items/generate", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
         response = call_openai(prompt, 256)
         lines = response.split('\n\n')
-        invalid = False
-        for line in lines:
-            if len(line.split('|')) != 3:
-                print("Retrying...")
-                invalid = True
-                break
+        if len(lines) == 10:
+            invalid = False
+            for line in lines:
+                if len(line.split('|')) != 3:
+                    print("Retrying...")
+                    invalid = True
+                    break
+        else:
+            invalid = True
         if not invalid:
             items = response
     data.set_character_items(id, items)

@@ -20,5 +20,6 @@ def create_location(realm_id, x = 100, y = 100):
 def generate_location_items(realm_id, x, y, setting, details):
     print("Creating location items...")
     prompt = generate_prompt("maps/generate_location_features", (setting, 10, "1000m", "1000m", details, ))
+    # Need to perform a check to make sure that formatting is right and that 10 items were actually generated.
     items = call_openai(prompt, 1024)
     data.update_map_items(realm_id, x, y, items)

@@ -121,13 +121,13 @@ async def handle_interactions(user_id):
             data.update_story(user_id, story)
         if current_issue is None:
             prompt = generate_prompt("storyline/create_issue", (realm[1], realm[2], location[1], location[2], scenario, setting, ))
-            current_issue = call_openai(prompt, 64)
+            current_issue = call_openai(prompt, 80)
             state['current_issue'] = current_issue
         if first:
             first = False
             # Change to a summary that includes scenario, location, setting, etc.
             prompt = generate_prompt("interactions/summarize_current", (scenario, location[1], setting, state['current_issue']))
-            current = call_openai(prompt, 512)
+            current = call_openai(prompt, 900)
             image_prompt = None
             prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
             while image_prompt is None:
@@ -148,6 +148,7 @@ async def handle_interactions(user_id):
                 await websocket.send("SYSTEM:MALICIOUS")
             else:
                 # Send message to all clients. This message also indicates that the system is going to be processing this message and therefore all clients should wait for "SYSTEM:FINISHED"
+                changed = False
                 processing = True
                 for playersocket in websockets.values():
                     if playersocket != websocket:
@@ -161,15 +162,14 @@ async def handle_interactions(user_id):
 
                 if decided.lower().startswith("yes"):
                     discussion += character[0] + ": " + message + '\n'
-                    prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, player_list, current_issue, discussion, ))
+                    # So far progress_round does not do a good job of finding fun ways for things to go wrong.
+                    # Eventually there could be a difficulty setting. For now it's defaulted to master to try to get issues to generate.
+                    prompt = generate_prompt("storyline/progress_round", (realm[1], location[1], location[2], scenario, setting, player_list, current_issue, "master", discussion, ))
                     gm_response = call_openai(prompt, 256)
-                    # Check update for setting, location items, location details, and
-                    # Check update might work well in Curie in which case I could save a few cents.
                     setting_progression = None
                     items_progression = None
                     location_progression = None
                     scenario_progression = None
-                    changed = False
 
                     # Maybe combine setting revision and changes in one chunk so it can be coordinated in correct order
                     old_setting = setting
@@ -265,9 +265,10 @@ async def handle_interactions(user_id):
                         response = call_openai(prompt, 1024)
                         data.update_story(user_id, response)
 
+                        # Maybe the new issue shouldn't be updated here, or maybe the new issue should be focused on the aftemath.
                         old_issue = current_issue
                         prompt = generate_prompt("storyline/create_issue", (realm[1], realm[2], location[1], location[2], scenario, setting, ))
-                        current_issue = call_openai(prompt, 64)
+                        current_issue = call_openai(prompt, 80)
                         state['current_issue'] = current_issue
 
                         prompt = generate_prompt("interactions/narrate_developments", (story, scenario_progression, details_progression, items_progression, setting_progression, old_issue, current_issue, ))
@@ -295,6 +296,7 @@ async def handle_interactions(user_id):
                     prompt = generate_prompt("interactions/request_clarification", (discussion, player_list, ))
                     gm_response = call_openai(prompt, 256)
                 else:
+                    # Not sure if embeddings would be a better approach here.
                     cnt = 0
                     parameters = None
                     while cnt != 3:
@@ -309,10 +311,11 @@ async def handle_interactions(user_id):
                         character_items = ""
                         if character_id is not None:
                             character_items = data.get_character_items(character_id)
-                        else:
+#                        else:
                             # If N/A assume it's about the currnet player.
-                            character_items = data.get_character_items(get_character_id(character[0]))
+#                            character_items = data.get_character_items(get_character_id(character[0]))
 
+                        # Can end up making up additional items based on what the player requests might be available.
                         prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, parameters[2], character_items))
                         injection = call_openai(prompt, 64)
                         discussion += "GM Note: " + injection + '\n'
@@ -332,9 +335,6 @@ async def handle_interactions(user_id):
                         character_skills = ""
                         if character_id is not None:
                             character_skills = data.get_character_skills(character_id)
-                        else:
-                            # If N/A assume it's about the currnet player.
-                            character_skills = data.get_character_skills(get_character_id(character[0]))
 
                         prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, parameters[2], character_skills))
                         injection = call_openai(prompt, 64)
@@ -343,6 +343,9 @@ async def handle_interactions(user_id):
                     prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, current_issue, discussion, ))
                     gm_response = call_openai(prompt, 256)
 
+                if changed:
+                    # Check if character items need updating.
+                    pass
                 processing = False
                 for playersocket in websockets.values():
                     await playersocket.send("SYSTEM:FINISHED")

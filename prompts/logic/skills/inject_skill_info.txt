@@ -7,6 +7,6 @@ Guessed Skill: {}
 Available Skills:
 {}
 
-Based on the new message and the guessed skill, pull pertinent information from available skills.
+Based on the new message and the guessed skill, pull pertinent information from available skills, without creating new skills or altering existing skills.
 
 Extracted Information:
