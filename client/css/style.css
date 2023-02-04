@@ -287,19 +287,19 @@ i.fas.fa-paper-plane{
 
 .narration-block img {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-	max-width: 100%; height: auto;
 	padding: 5px;
 	float: right;
 }
 
 .player-block {
+	overflow: hidden;
 	margin-top: 4px;
 	font-family: 'Garton', Arial, sans-serif;
 	font-size: 1.3em
 }
 
 .narration-block {
-	overflow: hidden
+	overflow: hidden;
 	font-family: 'Awery', Arial, sans-serif;
 }
 
