@@ -4,11 +4,7 @@ Planning quality ranges from poor, below average, adequate, good, excellent, or 
 
 Planning includes asking questions about the current scenario, figuring out a plan of action, considering risks, and coordinating activities.
 
-More planning is needed for more difficult quests. Difficulty ranges between novice, casual, standard, advanced, hardcore.
-
 Current Issue: {}
-
-Difficulty: {}
 
 Player Character List:
 {}

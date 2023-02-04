@@ -7,7 +7,7 @@ from random import randint
 # Note: Probably should be grabbing character by id only. Getting character id from name will be a problem if two people have the same name. But I guess I can just force unique names.
 
 # Will be based on party level at some point.
-skill = "master"
+skill = "novice"
 # Difficulty will be set by the players in the future, and will range between novice, casual, standard, advanced, hardcore.
 difficulty = "advanced"
 players = {}
@@ -173,11 +173,12 @@ async def handle_interactions(user_id):
                     discussion += character[0] + ": " + message + '\n'
 
                     # Evaluate the amount of planning and based on the skill level determine whether something goes wrong and how badly.
-                    prompt = generate_prompt("logic/evaluate_planning", (current_issue, difficulty, player_list, discussion, ))
+                    prompt = generate_prompt("logic/evaluate_planning", (current_issue, player_list, discussion, ))
                     # The worse the planning, the more likely it is that something will go wrong.
                     leeway = None
                     # After deciding whether a failure occurs, the combination of bonuses and penalties will determine how badly it goes wrong.
                     bonuses = {'novice': 0, 'initiate': 1, 'adept': 2, 'expert': 3, 'master': 4, 'legendary': 5}
+                    difficulty_cost = {'novice': 0, 'casual': 1, 'standard': 2, 'advanced': 4, 'hardcore': 8}
                     bonus = bonuses[skill]
                     penalty = 0
                     while leeway is None:
@@ -192,15 +193,19 @@ async def handle_interactions(user_id):
                             leeway = 8
                             penalty = 3
                         elif planning.startswith("good"):
-                            leeway = 10
+                            leeway = 16
                             penalty = 2
                         elif planning.startswith("excellent"):
-                            leeway = 15
+                            leeway = 32
                             penalty = 1
                         elif planning.startswith("extraordinary"):
-                            leeway = 20
+                            leeway = 64
                             penalty = 0
 
+                    # Increase the chance of something going wrong based on difficulty.
+                    # On hardcore, anything less than good will result in instant problem.
+                    # On advanced, anything less than adequate will result in an instant problem.
+                    leeway = max(1, leeway - difficulty_cost[difficulty])
                     # Roll dice and fail if they roll a 1.
                     roll = randint(1, leeway)
                     failure = (roll == 1)
@@ -210,10 +215,10 @@ async def handle_interactions(user_id):
                     else:
                         failure_levels = ['minor mishap', 'setback', 'failure', 'disaster', 'catastrophe']
                         cap = min(max(0, 4 - bonus + penalty), 4)
+                        print("Cap: " + str(cap))
                         failure_level = failure_levels[randint(0, cap)]
                         prompt = generate_prompt("storyline/progress_failed_round", (realm[1], location[1], location[2], scenario, setting, player_list, current_issue, failure_level, discussion, ))
                         gm_response = call_openai(prompt, 512)
-                    return # Temp for testing
                     setting_progression = None
                     items_progression = None
                     location_progression = None
