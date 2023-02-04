@@ -1,4 +1,10 @@
-The players have discussed their plan for the round.
+The players have discussed their plan for the round. Determine the quality of planning.
+
+Planning quality ranges from poor, below average, adequate, good, excellent, or extraordinary.
+
+Planning includes asking questions about the current scenario, figuring out a plan of action, considering risks, and coordinating activities.
+
+More planning is needed for more difficult quests. Difficulty ranges between novice, casual, standard, advanced, hardcore.
 
 Current Issue: {}
 
@@ -9,11 +15,5 @@ Player Character List:
 
 Discussion between GM and players:
 {}
-
-Planning quality ranges from poor, below average, adequate, good, excellent, or extraordinary.
-
-Planning includes asking questions about the current scenario, figuring out a plan of action, considering risks, and coordinating activities.
-
-More planning is needed for more difficult quests. Difficulty ranges between novice, casual, standard, advanced, hardcore.
 
 Based on the discussion, how was the quality of planning by the players?
