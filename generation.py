@@ -15,8 +15,54 @@ def generate_prompt(job, parameters = None):
         return template
     return wrapper(template.format, parameters)
 
-# So far all calls to openai should work with the same parameters so why repeat code?
-def call_openai(prompt, max_tokens = 256, model = "text-davinci-003"):
+def call_openai(prompt, max_tokens = 256, model = "text-davinci-003", temp = 0.7):
+    global token_use
+    response = None
+    while response is None:
+        try:
+            completion = openai.ChatCompletion.create(
+              model="gpt-3.5-turbo",
+              messages=[
+                {"role": "system", "content": prompt}
+              ]
+            )
+            response = completion["choices"][0].message.content;
+            tokens = completion['usage']['total_tokens']
+            token_use += tokens
+        except Exception as err:
+            print(err)
+            time.sleep(1)
+
+    print("\nUsage:" + str(token_use))
+    print("\n\nResponse:\n" + response)
+    return response
+
+def call_openai_old(prompt, max_tokens = 256, model = "gpt-3.5-turbo-0301"):
+    global token_use
+    print("\n\nPrompt:\n" + prompt)
+    response = None
+    while response is None:
+        try:
+            completion = openai.Completion.create(
+                model=model,
+                temperature=0.7,
+                max_tokens=max_tokens,
+                top_p=1,
+                frequency_penalty=0.1,
+                presence_penalty=0,
+                prompt=prompt)
+            response = completion["choices"][0]["text"].strip()
+            tokens = completion['usage']['total_tokens']
+            token_use += tokens
+        except Exception as err:
+            print("\nException: " + str(err))
+            time.sleep(1)
+
+    print("\nUsage:" + str(token_use))
+    print("\n\nResponse:\n" + response)
+    return response
+
+def call_openai_old(prompt, max_tokens = 256, model = "gpt-3.5-turbo-0301"):
     global token_use
     print("\n\nPrompt:\n" + prompt)
     response = None

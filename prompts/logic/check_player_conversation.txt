@@ -1,0 +1,12 @@
+The following is a discussion history between players and the GM, along with a new message.
+
+Player list:
+END LIST
+
+Discussion history:
+{}
+END HISTORY
+
+Message from {}: {}
+
+Is the new message directed at the GM or towards the other players (GM or players)?

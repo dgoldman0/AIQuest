@@ -159,6 +159,7 @@ async def handle_interactions(user_id):
                     if playersocket != websocket:
                         await playersocket.send("PLAYER:" + character[0] + "!" + message)
                 decided = ""
+                # Check if message is to another player, in which case skip everything else and wait for next message.
                 question = None
                 while question is None:
                     prompt = generate_prompt("logic/check_question", (message, ))
@@ -335,11 +336,13 @@ async def handle_interactions(user_id):
                         image_url = generate_image(image_prompt)
                         await websocket.send("NARRATION:![Developments](" + image_url + ")" + developments.replace('\n', '\n\n'))
                         # Determine player advancement.
-                        prompt = generate_prompt("logic/check_advancement", (story, scenario_progression, details_progression, items_progression, setting_progression, old_issue, current_issue, ))
-                        advance = call_openai(prompt, 32)
-                        if (advance.lower().startswith("yes")):
-                            for player_id in players.values():
-                                pass
+                        # The harder the challenge, the more the player should be able to advance, but higher level characters require more experience.
+                        # Advancement should not occur every single time an issue is resolved. It depends on the overall progress in the story, and how successful the resolution is.
+#                        prompt = generate_prompt("logic/check_advancement", (story, scenario_progression, details_progression, items_progression, setting_progression, old_issue, current_issue, ))
+#                        advance = call_openai(prompt, 32)
+#                        if (advance.lower().startswith("yes")):
+#                            for player_id in players.values():
+#                                pass
                     else:
                         prompt = generate_prompt("interactions/images/summary", (setting, location[1], location[2]))
                         image_prompt = None
