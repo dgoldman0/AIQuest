@@ -160,13 +160,13 @@ async def handle_interactions(user_id):
                         await playersocket.send("PLAYER:" + character[0] + "!" + message)
                 decided = ""
                 # Check if message is to another player, in which case skip everything else and wait for next message.
-                question = None
+                to_gm = None
                 while question is None:
-                    prompt = generate_prompt("logic/check_question", (message, ))
-                    question = call_openai(prompt, 32).lower()
-                    if (not question.startswith("yes")) and (not question.startswith("no")):
-                        question = None
-                if question.startswith("no"):
+                    prompt = generate_prompt("logic/check_player_conversation", (message, ))
+                    to_gm = call_openai(prompt, 32).lower()
+                    if (not question.startswith("gm")) and (not to_gm.startswith("players")):
+                        to_gm = None
+                if to_gm.startswith("gm"):
                     prompt = generate_prompt("logic/check_players_decided", (current_issue, player_list, discussion, ))
                     decided = call_openai(prompt, 32)
 
@@ -358,52 +358,53 @@ async def handle_interactions(user_id):
                     prompt = generate_prompt("interactions/request_clarification", (discussion, player_list, ))
                     gm_response = call_openai(prompt, 256)
                 else:
-                    # Not sure if embeddings would be a better approach here.
-                    cnt = 0
-                    parameters = None
-                    while cnt != 3:
-                        prompt = generate_prompt("logic/items/check_items", (character[0], message, ))
-                        list = call_openai(prompt, 32)
-                        parameters = [parameter.strip() for parameter in list.split('|')]
-                        cnt = len(parameters)
-                        if cnt != 3:
-                            print("Incorrect arg count. Trying again...")
-                    if parameters[0].lower() == "yes":
-                        character_id = data.get_character_id(parameters[1])
-                        character_items = ""
-                        if character_id is not None:
-                            character_items = data.get_character_items(character_id)
-#                        else:
-                            # If N/A assume it's about the currnet player.
-#                            character_items = data.get_character_items(get_character_id(character[0]))
+                    if to_gm == "players":
+                        # Not sure if embeddings would be a better approach here.
+                        cnt = 0
+                        parameters = None
+                        while cnt != 3:
+                            prompt = generate_prompt("logic/items/check_items", (character[0], message, ))
+                            list = call_openai(prompt, 32)
+                            parameters = [parameter.strip() for parameter in list.split('|')]
+                            cnt = len(parameters)
+                            if cnt != 3:
+                                print("Incorrect arg count. Trying again...")
+                        if parameters[0].lower() == "yes":
+                            character_id = data.get_character_id(parameters[1])
+                            character_items = ""
+                            if character_id is not None:
+                                character_items = data.get_character_items(character_id)
+    #                        else:
+                                # If N/A assume it's about the currnet player.
+    #                            character_items = data.get_character_items(get_character_id(character[0]))
 
-                        # Can end up making up additional items based on what the player requests might be available.
-                        prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, parameters[2], character_items))
-                        injection = call_openai(prompt, 64)
-                        discussion += "GM Note: " + injection + '\n'
+                            # Can end up making up additional items based on what the player requests might be available.
+                            prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, parameters[2], character_items))
+                            injection = call_openai(prompt, 64)
+                            discussion += "GM Note: " + injection + '\n'
 
-                    # Do I check both items and skills independently?
-                    cnt = 0
-                    parameters = None
-                    while cnt != 3:
-                        prompt = generate_prompt("logic/skills/check_skills", (character[0], message, ))
-                        list = call_openai(prompt, 32)
-                        parameters = [parameter.strip() for parameter in list.split('|')]
-                        cnt = len(parameters)
-                        if cnt != 3:
-                            print("Incorrect arg count. Trying again...")
-                    if parameters[0].lower() == "yes":
-                        character_id = data.get_character_id(parameters[1])
-                        character_skills = ""
-                        if character_id is not None:
-                            character_skills = data.get_character_skills(character_id)
+                        # Do I check both items and skills independently?
+                        cnt = 0
+                        parameters = None
+                        while cnt != 3:
+                            prompt = generate_prompt("logic/skills/check_skills", (character[0], message, ))
+                            list = call_openai(prompt, 32)
+                            parameters = [parameter.strip() for parameter in list.split('|')]
+                            cnt = len(parameters)
+                            if cnt != 3:
+                                print("Incorrect arg count. Trying again...")
+                        if parameters[0].lower() == "yes":
+                            character_id = data.get_character_id(parameters[1])
+                            character_skills = ""
+                            if character_id is not None:
+                                character_skills = data.get_character_skills(character_id)
 
-                        prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, parameters[2], character_skills))
-                        injection = call_openai(prompt, 64)
-                        discussion += "GM Note: " + injection + '\n'
-                    discussion += character[0] + ": " + message + '\n'
-                    prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, current_issue, discussion, ))
-                    gm_response = call_openai(prompt, 256)
+                            prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, parameters[2], character_skills))
+                            injection = call_openai(prompt, 64)
+                            discussion += "GM Note: " + injection + '\n'
+                        discussion += character[0] + ": " + message + '\n'
+                        prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, current_issue, discussion, ))
+                        gm_response = call_openai(prompt, 256)
 
                 if changed:
                     # Check if character items need updating.

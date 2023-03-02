@@ -8,4 +8,4 @@ Location Features:
 Feature ID | Feature | Description | Location | Dimensions
 {}
 
-Describe what is seen.
+Describe what is seen (in less than 1000 characters).

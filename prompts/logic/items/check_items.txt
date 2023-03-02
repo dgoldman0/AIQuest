@@ -7,3 +7,4 @@ Objects can be general, such as "anything" or "something."
 Use a table format to answer: About Object | Whose Object (do not use possessive) | What Object
 
 About Object (yes or no) | Whose Object (or N/A) | What Object (or N/A)
+-------------|--------------|--------------

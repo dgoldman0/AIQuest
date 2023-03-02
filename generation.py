@@ -15,18 +15,20 @@ def generate_prompt(job, parameters = None):
         return template
     return wrapper(template.format, parameters)
 
-def call_openai(prompt, max_tokens = 256, model = "text-davinci-003", temp = 0.7):
+def call_openai(prompt, max_tokens = 256, temp = 0.7):
     global token_use
     response = None
+    print("Prompt: " + prompt  + "\n\n")
     while response is None:
         try:
             completion = openai.ChatCompletion.create(
               model="gpt-3.5-turbo",
+              max_tokens=max_tokens,
               messages=[
                 {"role": "system", "content": prompt}
               ]
             )
-            response = completion["choices"][0].message.content;
+            response = completion["choices"][0].message.content.strip();
             tokens = completion['usage']['total_tokens']
             token_use += tokens
         except Exception as err:

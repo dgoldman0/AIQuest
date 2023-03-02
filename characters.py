@@ -20,7 +20,7 @@ def generate_clans(realm_id, name, setting, history):
         valid_prompt = True
         for clan in clanlist:
             if len(clan.split("|")) != 4:
-                print("Incorrect arg count. Trying again...")
+                print("Incorrect arg count. Trying again: " + clan + "\n")
                 valid_prompt = False
                 break
     for clan in clanlist:

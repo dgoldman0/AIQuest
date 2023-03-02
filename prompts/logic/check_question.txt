@@ -1,3 +1,0 @@
-Is the message a question?
-
-Message: {}
