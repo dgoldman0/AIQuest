@@ -9,4 +9,4 @@ END HISTORY
 
 Message from {}: {}
 
-Is the new message directed at the GM, towards the other players, or towards a character (gm, players, character)?
+Is the new message directed at the GM, towards the other players, or towards a character (answer only with gm, players, character)?

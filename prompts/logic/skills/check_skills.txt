@@ -7,3 +7,4 @@ Skills can be general, such as "anything" or "something."
 Use a table format to answer: About Skill | Whose Skill (do not use possessive) | What Skill
 
 About Skill (yes or no) | Whose Skill (or N/A) | What Skill (or N/A)
+-------------|--------------|--------------

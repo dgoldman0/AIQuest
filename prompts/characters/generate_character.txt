@@ -8,5 +8,4 @@ Clan Name | Clan Description | Elemental Affinities
 
 Character Level (novice, initiate, adept, expert, master, legendary): {}
 
-Use the following format:
-Character Name | Background (Detailed) | Starting Elemental Affinities
+Use the following format (Character Name | Background (Detailed) | Starting Elemental Affinities) without table header:

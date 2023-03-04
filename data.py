@@ -47,6 +47,7 @@ def init():
             cur.execute("CREATE TABLE MAPS (realm INT NOT NULL DEFAULT 0, x INT NOT NULL, y INT NOT NULL, last_explored INT NOT NULL DEFAULT -1, description TEXT NOT NULL, items TEXT);")
             # Will have to work on adding groups/parties. Scenarios will go under party info.
             cur.execute("CREATE TABLE SCENARIOS (scenario TEXT NOT NULL);")
+            # Need to add another table for parties, which would also include the current issue of the party.
             database.commit()
             # Create initial realm.
             realms.create_realm()

@@ -62,8 +62,9 @@ async def welcome(user_id, character_id, clan_id, realm_id, x, y):
     await load(user_id)
 
 async def sendAll(message, excluded = None):
+    print("Sending...")
     for playersocket in websockets.values():
-        if playersocket != websocket:
+        if playersocket != excluded:
             await playersocket.send(message)
 
 async def load(user_id):
@@ -101,42 +102,39 @@ async def handle_interactions(user_id):
     # Handle user commands.
     first = True
     while True:
+        # This should really be in stored in the database
         current_issue = state.get('current_issue')
         scenario = data.get_scenario()
         setting = data.get_current_setting(user_id)
         story = data.get_story(user_id)
-        player_list = ""
-        for player in players.keys():
-            player_list += player + '\n'
-        player_list = player_list.strip()
 
         if scenario is None:
             # setting, history, location details, location items, player's character name, player background, player clan, clan description
             prompt = generate_prompt("storyline/create_scenario", (state['realm'][1], state['realm'][2], state['location'][1], state['location'][2], state['character'][0], state['character'][2], state['clan'][0], state['clan'][2]))
             scenario = call_openai(prompt, 256)
             data.add_scenario(scenario)
-        state.scenario = scenario
+        state['scenario'] = scenario
         if setting is None:
-            prompt = generate_prompt("storyline/create_setting", (state.realm[1], state.realm[2], state.location[1], state.location[2], state.scenario, ))
+            prompt = generate_prompt("storyline/create_setting", (state['realm'][1], state['realm'][2], state['location'][1], state['location'][2], state['scenario'], ))
             setting = call_openai(prompt, 400)
             data.update_current_setting(user_id, setting)
-        state.setting = setting
+        state['setting'] = setting
         if story is None:
             story = scenario
             data.update_story(user_id, story)
-        state.story = story
+        state['story'] = story
         if current_issue is None:
-            prompt = generate_prompt("storyline/create_issue", (state.realm[1], state.realm[2], state.location[1], state.location[2], state.scenario, setting, ))
+            prompt = generate_prompt("storyline/create_issue", (state['realm'][1], state['realm'][2], state['location'][1], state['location'][2], state['scenario'], setting, ))
             current_issue = call_openai(prompt, 80)
-        state.current_issue = current_issue
+        state['current_issue'] = current_issue
 
         if first:
             first = False
             # Change to a summary that includes scenario, location, setting, etc.
-            prompt = generate_prompt("interactions/summarize_current", (scenario, state.location[1], setting, state['current_issue']))
+            prompt = generate_prompt("interactions/summarize_current", (scenario, state['location'][1], state['setting'], state['current_issue']))
             current = call_openai(prompt, 900)
             image_prompt = None
-            prompt = generate_prompt("interactions/images/summary", (setting, state.location[1], state.location[2]))
+            prompt = generate_prompt("interactions/images/summary", (setting, state['location'][1], state['location'][2]))
             while image_prompt is None:
                 summary = call_openai(prompt, 245)
                 if len(summary) < 1000:
@@ -149,6 +147,7 @@ async def handle_interactions(user_id):
         if not processing and message.startswith("MSG:"):
             message = message[4:]
             # Check if the message appears malicious.
+            # This would be a good place to use the new updated version where you can set the message type
             prompt = generate_prompt("logic/check_malicious", (message, ))
             malicious = call_openai(prompt, 32)
             if malicious.lower().startswith("yes"):
@@ -157,9 +156,9 @@ async def handle_interactions(user_id):
                 # Send message to all clients. This message also indicates that the system is going to be processing this message and therefore all clients should wait for "SYSTEM:FINISHED"
                 changed = False
                 processing = True
-                        await sendAll("PLAYER:" + state.character[0] + "!" + message, websocket)
+                await sendAll("PLAYER:" + state['character'][0] + "!" + message, websocket)
                 # check combat vs non-combat
-                handleMessage(state, message)
+                await handleMessage(state, message)
                 processing = False
                 for playersocket in websockets.values():
                     await playersocket.send("SYSTEM:FINISHED")
@@ -168,24 +167,29 @@ async def handle_interactions(user_id):
                 await websocket.send("SYSTEM:PROCESSING")
 
 async def handleMessage(state, message):
-    global discussion
+    global discussion, players
+    # Should be a cleaner way to do this in one line, and copy it over for other areas where I need the player list
+    player_list = ""
+    for player in players.keys():
+        player_list += player + '\n'
+    player_list = player_list.strip()
     decided = ""
-    # Check if message is to another player, in which case skip everything else and wait for next message.
+    gm_response = None
     to_gm = None
-    while question is None:
-        prompt = generate_prompt("logic/check_player_conversation", (message, ))
+    while to_gm is None:
+        prompt = generate_prompt("logic/check_player_conversation", (discussion, state['character'][0], message, ))
         to_gm = call_openai(prompt, 32).lower()
-        if (not question.startswith("gm")) and (not to_gm.startswith("players")) and (not to_gm.startswith("character")):
+        if (not to_gm.startswith("gm")) and (not to_gm.startswith("players")) and (not to_gm.startswith("character")):
             to_gm = None
     if to_gm.startswith("gm"):
-        prompt = generate_prompt("logic/check_players_decided", (state.current_issue, state.player_list, state.discussion, ))
+        prompt = generate_prompt("logic/check_players_decided", (state['current_issue'], player_list, discussion, state['character'][0], message, ))
         decided = call_openai(prompt, 32)
 
     if decided.lower().startswith("yes"):
-        discussion += character[0] + ": " + message + '\n'
-        stepRound(state)
+        discussion += state['character'][0] + ": " + message + '\n'
+        #await stepRound(state)
     elif decided.lower().startswith("unsure"):
-        discussion += character[0] + ": " + message + '\n'
+        discussion += state['character'][0] + ": " + message + '\n'
         prompt = generate_prompt("interactions/request_clarification", (discussion, player_list, ))
         gm_response = call_openai(prompt, 256)
     else:
@@ -194,31 +198,30 @@ async def handleMessage(state, message):
             cnt = 0
             parameters = None
             while cnt != 3:
-                prompt = generate_prompt("logic/items/check_items", (character[0], message, ))
+                prompt = generate_prompt("logic/items/check_items", (state['character'][0], message, ))
                 list = call_openai(prompt, 32)
                 parameters = [parameter.strip() for parameter in list.split('|')]
                 cnt = len(parameters)
                 if cnt != 3:
                     print("Incorrect arg count. Trying again...")
             if parameters[0].lower() == "yes":
-                character_id = data.get_character_id(parameters[1])
+                character_id = data.get_character_id(f[1])
                 character_items = ""
                 if character_id is not None:
                     character_items = data.get_character_items(character_id)
-#                        else:
+                else:
                     # If N/A assume it's about the currnet player.
-#                            character_items = data.get_character_items(get_character_id(character[0]))
+                    character_items = data.get_character_items(get_character_id(state['character'][0]))
 
                 # Can end up making up additional items based on what the player requests might be available.
-                prompt = generate_prompt("logic/items/inject_item_info", (character[0], message, parameters[2], character_items))
+                prompt = generate_prompt("logic/items/inject_item_info", (state['character'][0], message, parameters[2], character_items))
                 injection = call_openai(prompt, 64)
                 discussion += "GM Note: " + injection + '\n'
 
-            # Do I check both items and skills independently?
             cnt = 0
             parameters = None
             while cnt != 3:
-                prompt = generate_prompt("logic/skills/check_skills", (character[0], message, ))
+                prompt = generate_prompt("logic/skills/check_skills", (state['character'][0], message, ))
                 list = call_openai(prompt, 32)
                 parameters = [parameter.strip() for parameter in list.split('|')]
                 cnt = len(parameters)
@@ -230,26 +233,22 @@ async def handleMessage(state, message):
                 if character_id is not None:
                     character_skills = data.get_character_skills(character_id)
 
-                prompt = generate_prompt("logic/skills/inject_skill_info", (character[0], message, parameters[2], character_skills))
+                prompt = generate_prompt("logic/skills/inject_skill_info", (state['character'][0], message, parameters[2], character_skills))
                 injection = call_openai(prompt, 64)
                 discussion += "GM Note: " + injection + '\n'
-            discussion += character[0] + ": " + message + '\n'
-            prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, current_issue, discussion, ))
+            discussion += state['character'][0] + ": " + message + '\n'
+            prompt = generate_prompt("interactions/discuss", (state['realm'][1], state['location'][1], state['location'][2], state['scenario'], state['setting'], player_list, state['character'][0], message, state['current_issue'], discussion, ))
             gm_response = call_openai(prompt, 256)
         else:
-            prompt = generate_prompt("interactions/discuss", (realm[1], location[1], location[2], scenario, setting, player_list, character[0], message, current_issue, discussion, ))
+            prompt = generate_prompt("interactions/discuss", (state['realm'][1], state['location'][1], state['location'][2], state['scenario'], state['setting'], player_list, state['character'][0], message, state['current_issue'], discussion, ))
             gm_response = call_openai(prompt, 256)
 
-        # Not correct
-        await sendAll(gm_response)
-    if changed:
-        # Check if character items need updating.
-        pass
+        await sendAll("NARRATION:" + gm_response)
 
 async def stepRound(state):
     global discussion
     # Evaluate the amount of planning and based on the skill level determine whether something goes wrong and how badly.
-    prompt = generate_prompt("logic/evaluate_planning", (current_issue, player_list, discussion, ))
+    prompt = generate_prompt("logic/evaluate_planning", (state['current_issue'], player_list, discussion, ))
     # The worse the planning, the more likely it is that something will go wrong.
     leeway = None
     # After deciding whether a failure occurs, the combination of bonuses and penalties will determine how badly it goes wrong.
@@ -409,7 +408,7 @@ async def stepRound(state):
             if len(summary) < 1000:
                 image_prompt = summary
         image_url = generate_image(image_prompt)
-        await websocket.send("NARRATION:![Developments](" + image_url + ")" + developments.replace('\n', '\n\n'))
+        await sendAll("NARRATION:![Developments](" + image_url + ")" + developments.replace('\n', '\n\n'))
         # Determine player advancement.
         # The harder the challenge, the more the player should be able to advance, but higher level characters require more experience.
         # Advancement should not occur every single time an issue is resolved. It depends on the overall progress in the story, and how successful the resolution is.
@@ -426,5 +425,5 @@ async def stepRound(state):
             if len(summary) < 1000:
                 image_prompt = summary
         image_url = generate_image(image_prompt)
-        await websocket.send("NARRATION:![GM Response](" + image_url + ")" + gm_response.replace('\n', '\n\n'))
+        await sendAll("NARRATION:![GM Response](" + image_url + ")" + gm_response.replace('\n', '\n\n'))
     discussion = ""

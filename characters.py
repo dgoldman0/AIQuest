@@ -53,7 +53,7 @@ def generate_character(level, clan_id, realm_id, x, y, user_id = None):
     while items is None:
         prompt = generate_prompt("characters/items/generate", (clan[0], clan[1], parameters[1], features, parameters[2], level, ))
         response = call_openai(prompt, 256)
-        lines = response.split('\n\n')
+        lines = response.split('\n')
         if len(lines) == 10:
             invalid = False
             for line in lines:

@@ -16,7 +16,7 @@ Setting:
 Player Characters:
 {}
 
-Players are coordinating what to do this round. Give a new GM response based on the new message and the existing discussion. Do not make decisions about the behavior of player characters.
+Players are coordinating what to do this round. Give a new GM response based on the new message and the existing discussion. Do not make decisions about the behavior of player characters. Do not have the player characters take any actions. 
 
 A new message has been received from {}.
 Message: {}
@@ -27,4 +27,4 @@ Existing discussion between the players and the GM for the current round:
 {}
 End of Discussion
 
-GM Response (any actions need to be held for the round):
+Respond as GM (do not make decisions or take any actions on behalf of the players):

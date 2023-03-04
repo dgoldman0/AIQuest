@@ -5,8 +5,16 @@ Player Character List:
 
 The players are prepared when each player in the Player Character List has voiced their desired course of action and each has finished asking questions. If anyone from the Player Character List is still asking questions, then the players are not prepared. If the players are still discussing their plan with each other, then the players are not prepared. If the most recent comment in the discussion is a question, then the players are not prepared.
 
-Discussion:
+Current Discussion:
 {}
 End of Discussion
 
-Are all players in the Player Character List prepared (yes, no, unsure)?
+New message from {}: {}
+
+Based on the current discussion, and the most recent message, are the players done asking questions and making decisions about what to do next?
+
+It's more likely that they're done if everyone in the player character list has spoken in the current discussion.
+
+If the new message is a question then the answer should be no.
+
+Answer only with yes, no, or unsure:
